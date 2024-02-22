@@ -1,4 +1,5 @@
-import { MatterBridge } from '../matterbridge/src/MatterBridge.ts'; 
+import { Matterbridge } from '../../matterbridge/dist/MatterBridge.js'; 
+import { AnsiLogger, REVERSE, REVERSEOFF } from 'node-ansi-logger';
 
 /**
  * This is the standard interface for MatterBridge plugins.
@@ -6,14 +7,20 @@ import { MatterBridge } from '../matterbridge/src/MatterBridge.ts';
  * 
  * @param bridge - An instance of MatterBridge
  */
-export default function initializePlugin(bridge: MatterBridge) {
+export default function initializePlugin(bridge: Matterbridge, log: AnsiLogger) {
+  // Log it's loading
+  log.info('My Plugin is loading...');
 
-  // Plugin initialization logic here
+  bridge.on('start', (reason: string) => {
+    log.info(`Received ${REVERSE}start${REVERSEOFF} reason: ${reason}`);
+    // Plugin initialization logic here
+  });
+
   bridge.on('shutdown', (reason: string) => {
-    console.log(`Shutdown reason: ${reason}`);
+    log.info(`Received ${REVERSE}shutdown${REVERSEOFF} reason: ${reason}`);
     // Plugin cleanup or other logic
   });
 
   // Log or perform other setup tasks
-  bridge.log.info('My Plugin initialized successfully');
+  log.info('My Plugin initialized successfully!');
 }
