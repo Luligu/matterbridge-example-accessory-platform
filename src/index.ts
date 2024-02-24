@@ -41,11 +41,11 @@ export default function initializePlugin(matterbridge: Matterbridge, log: AnsiLo
   const storageManager = new StorageManager(storageJson);
   const matterServer = new MatterServer(storageManager);
 
-  log.info('My Plugin is loading...');
+  log.info('Matterbridge platform example plugin is loading...');
 
   const platform = new ExampleMatterbridgePlatform(matterbridge, log);
 
-  log.info('My Plugin initialized successfully!');
+  log.info('Matterbridge platform example plugin initialized successfully!');
   return platform
 }
 
