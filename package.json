@@ -1,7 +1,7 @@
 {
   "name": "matterbridge-example-platform",
   "version": "1.0.0",
-  "description": "Matterbridge plugin example",
+  "description": "Matterbridge platform plugin example",
   "author": "https://github.com/Luligu",
   "license": "MIT",
   "type": "module",

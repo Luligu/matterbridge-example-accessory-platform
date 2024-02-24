@@ -43,8 +43,7 @@ export default function initializePlugin(matterbridge: Matterbridge, log: AnsiLo
 
   log.info('My Plugin is loading...');
 
-  //const platform = new ExampleMatterbridgePlatform(matterbridge, log);
-  const platform = new ExampleMatterbridgeDynamicPlatform(matterbridge, log);
+  const platform = new ExampleMatterbridgePlatform(matterbridge, log);
 
   log.info('My Plugin initialized successfully!');
   return platform
@@ -93,55 +92,3 @@ class ExampleMatterbridgePlatform extends MatterbridgePlatform {
     this.log.info(`onShutdown called (matterbridge is running on node v${this.matterbridge.nodeVersion})`);
   }
 }
-
-class ExampleMatterbridgeDynamicPlatform extends MatterbridgeDynamicPlatform {
-
-  constructor(matterbridge: Matterbridge, log: AnsiLogger) {
-    super(matterbridge, log);
-    log.debug(`ExampleMatterbridgeDynamicPlatform loaded (matterbridge is running on node v${matterbridge.nodeVersion})`);
-  }
-
-  override onStartDynamicPlatform(): void {
-    this.log.info(`onStartDynamicPlatform called (matterbridge is running on node v${this.matterbridge.nodeVersion})`);
-
-    const matterDevice1 = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING);
-    matterDevice1.createDefaultIdentifyClusterServer();
-    matterDevice1.createDefaultGroupsClusterServer();
-    matterDevice1.createDefaultScenesClusterServer();
-    matterDevice1.createDefaultBridgedDeviceBasicInformationClusterServer('BridgedDevice1', 'BridgedDevice1 0x01020564', 0xfff1, 'Luligu', 'BridgedDevice1');
-    matterDevice1.createDefaultPowerSourceRechargableBatteryClusterServer(86);
-    matterDevice1.createDefaultWindowCoveringClusterServer();
-    this.registerDevice(matterDevice1)
-
-    matterDevice1.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
-      this.log.warn(`Command identify called identifyTime:${identifyTime}`);
-    });
-    matterDevice1.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      this.log.warn(`Command goToLiftPercentage called liftPercent100thsValue:${liftPercent100thsValue}`);
-    });
-
-    const matterDevice2 = new MatterbridgeDevice(DeviceTypes.ON_OFF_LIGHT);
-    matterDevice2.createDefaultIdentifyClusterServer();
-    matterDevice2.createDefaultGroupsClusterServer();
-    matterDevice2.createDefaultScenesClusterServer();
-    matterDevice2.createDefaultBridgedDeviceBasicInformationClusterServer('BridgedDevice2', 'BridgedDevice2 0x23023304', 0xfff1, 'Luligu', 'BridgedDevice2');
-    matterDevice2.createDefaultPowerSourceReplaceableBatteryClusterServer(70);
-    matterDevice2.createDefaultOnOffClusterServer();
-    this.registerDevice(matterDevice2)
-
-    matterDevice2.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
-      this.log.warn(`Command identify called identifyTime:${identifyTime}`);
-    });
-    matterDevice2.addCommandHandler('on', async () => {
-      this.log.warn('Command on called');
-    });
-    matterDevice2.addCommandHandler('off', async () => {
-      this.log.warn('Command off called');
-    });
-  }
-
-  override onShutdown(): void {
-    this.log.info(`onShutdown called (matterbridge is running on node v${this.matterbridge.nodeVersion})`);
-  }
-}
-
