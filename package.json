@@ -1,5 +1,5 @@
 {
-  "name": "matterbridge-example-platform",
+  "name": "matterbridge-example-accessory-platform",
   "version": "1.0.0",
   "description": "Matterbridge platform plugin example",
   "author": "https://github.com/Luligu",
@@ -9,10 +9,10 @@
   "types": "dist/index.d.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Luligu/matterbridge-example-platform"
+    "url": "https://github.com/Luligu/matterbridge-example-accessory-platform"
   },
   "bugs": {
-    "url": "https://github.com/Luligu/matterbridge-example-platform/issues"
+    "url": "https://github.com/Luligu/matterbridge-example-accessory-platform/issues"
   },
   "keywords": [
     "matterbridge",
