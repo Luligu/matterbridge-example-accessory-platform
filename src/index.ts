@@ -23,8 +23,7 @@ import {
 import { 
   Matterbridge,
   MatterbridgeDevice,
-  MatterbridgeDynamicPlatform,
-  MatterbridgePlatform,
+  MatterbridgeAccessoryPlatform,
 } from '../../matterbridge/dist/index.js'; 
 import { AnsiLogger, REVERSE, REVERSEOFF } from 'node-ansi-logger';
 
@@ -49,7 +48,7 @@ export default function initializePlugin(matterbridge: Matterbridge, log: AnsiLo
   return platform
 }
 
-class ExampleMatterbridgePlatform extends MatterbridgePlatform {
+class ExampleMatterbridgePlatform extends MatterbridgeAccessoryPlatform {
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger) {
     super(matterbridge, log);
