@@ -1,29 +1,29 @@
-import { DeviceTypes } from '@project-chip/matter-node.js/device';
+import { DeviceTypes, WindowCovering, WindowCoveringCluster } from 'matterbridge';
 
-import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform } from '../../matterbridge/dist/index.js';
+import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform } from 'matterbridge';
 import { AnsiLogger } from 'node-ansi-logger';
-import { WindowCovering, WindowCoveringCluster } from '@project-chip/matter-node.js/cluster';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   constructor(matterbridge: Matterbridge, log: AnsiLogger) {
     super(matterbridge, log);
   }
 
-  override onStartAccessoryPlatform(): void {
-    this.log.info('onStartAccessoryPlatform called');
+  override async onStart(reason?: string) {
+    this.log.info('onStart called with reason:', reason ?? 'none');
 
     const cover = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING);
     cover.createDefaultIdentifyClusterServer();
-    cover.createDefaultBasicInformationClusterServer('Device1', 'Device1 0x9010880304', 0xfff1, 'Luligu', 0x0001, 'Device1');
+    cover.createDefaultBasicInformationClusterServer('Accessory device', '0x59108853', 0xfff1, 'Luligu', 0x0001, 'Accessory device');
+    cover.createDefaultPowerSourceWiredClusterServer();
     cover.createDefaultWindowCoveringClusterServer(10000);
-    this.registerDevice(cover);
+    await this.registerDevice(cover);
 
     cover.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
-      this.log.warn(`Command identify called identifyTime:${identifyTime}`);
+      this.log.info(`Command identify called identifyTime:${identifyTime}`);
     });
 
     cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      this.log.warn(`Command goToLiftPercentage called liftPercent100thsValue:${liftPercent100thsValue}`);
+      this.log.info(`Command goToLiftPercentage called liftPercent100thsValue:${liftPercent100thsValue}`);
     });
 
     setInterval(() => {
@@ -38,12 +38,12 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
           lift: WindowCovering.MovementStatus.Stopped,
           tilt: WindowCovering.MovementStatus.Stopped,
         });
-        this.log.warn(`Set liftPercent100thsValue to ${position}`);
+        this.log.info(`Set liftPercent100thsValue to ${position}`);
       }
-    }, 10 * 1000);
+    }, 60 * 1000);
   }
 
-  override onShutdown(): void {
-    this.log.info('onShutdown called');
+  override async onShutdown(reason?: string) {
+    this.log.info('onShutdown called with reason:', reason ?? 'none');
   }
 }
