@@ -5,7 +5,6 @@ import { AnsiLogger } from 'node-ansi-logger';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover: MatterbridgeDevice | undefined;
-  //cover2: MatterbridgeDevice | undefined;
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger) {
     super(matterbridge, log);
@@ -28,15 +27,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
       this.log.info(`Command goToLiftPercentage called liftPercent100thsValue:${liftPercent100thsValue}`);
     });
-
-    /*
-    this.cover2 = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING);
-    this.cover2.createDefaultIdentifyClusterServer();
-    this.cover2.createDefaultBasicInformationClusterServer('Accessory device 2', '0x59148353', 0xfff1, 'Matterbridge', 0x0001, 'Accessory device');
-    this.cover2.createDefaultPowerSourceWiredClusterServer();
-    this.cover2.createDefaultWindowCoveringClusterServer(10000);
-    await this.registerDevice(this.cover2);
-    */
   }
 
   override async onConfigure() {
