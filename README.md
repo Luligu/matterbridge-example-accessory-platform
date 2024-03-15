@@ -11,3 +11,5 @@
 ---
 
 Matterbridge accessory platform example plugin is a template to develop your own plugin using the accessory platform.
+
+See the guidelines on [Matterbridge](https://github.com/Luligu/matterbridge) for more information.
