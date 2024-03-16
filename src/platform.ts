@@ -5,6 +5,7 @@ import { AnsiLogger } from 'node-ansi-logger';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover: MatterbridgeDevice | undefined;
+  coverInterval: NodeJS.Timeout | undefined;
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger) {
     super(matterbridge, log);
@@ -32,7 +33,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onConfigure() {
     this.log.info('onConfigure called');
 
-    setInterval(() => {
+    this.coverInterval = setInterval(() => {
       if (!this.cover) return;
       const coverCluster = this.cover.getClusterServer(WindowCoveringCluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift));
       if (coverCluster && coverCluster.getCurrentPositionLiftPercent100thsAttribute) {
@@ -52,5 +53,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
   override async onShutdown(reason?: string) {
     this.log.info('onShutdown called with reason:', reason ?? 'none');
+    clearInterval(this.coverInterval);
   }
 }
