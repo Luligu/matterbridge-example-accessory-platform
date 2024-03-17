@@ -26,7 +26,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     });
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      this.log.info(`Command goToLiftPercentage called liftPercent100thsValue:${liftPercent100thsValue}`);
+      this.log.info(`Command goToLiftPercentage called. Request: liftPercent100thsValue:${liftPercent100thsValue}`);
     });
   }
 
@@ -54,5 +54,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onShutdown(reason?: string) {
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     clearInterval(this.coverInterval);
+    await this.unregisterAllDevices();
   }
 }
