@@ -1,4 +1,4 @@
-import { DeviceTypes, WindowCovering, WindowCoveringCluster } from 'matterbridge';
+import { DeviceTypes, WindowCovering } from 'matterbridge';
 
 import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform } from 'matterbridge';
 import { AnsiLogger } from 'node-ansi-logger';
@@ -25,19 +25,60 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       this.log.info(`Command identify called identifyTime:${identifyTime}`);
     });
 
-    this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      this.log.info(`Command goToLiftPercentage called. Request: liftPercent100thsValue:${liftPercent100thsValue}`);
+    this.cover.addCommandHandler('stopMotion', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
+      const position = currentPositionLiftPercent100ths?.getLocal();
+      if (position !== null && position !== undefined) targetPositionLiftPercent100ths?.setLocal(position);
+      operationalStatus.setLocal({
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      });
+      this.log.debug(`Command stopMotion called. Attributes: currentPositionLiftPercent100ths: ${currentPositionLiftPercent100ths?.getLocal()}`);
+      this.log.debug(`Command stopMotion called. Attributes: targetPositionLiftPercent100ths: ${targetPositionLiftPercent100ths?.getLocal()}`);
+      this.log.debug(`Command stopMotion called. Attributes: operationalStatus: ${operationalStatus?.getLocal().lift}`);
     });
+
+    this.cover.addCommandHandler(
+      'goToLiftPercentage',
+      async ({ request: { liftPercent100thsValue }, attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
+        currentPositionLiftPercent100ths?.setLocal(liftPercent100thsValue);
+        targetPositionLiftPercent100ths?.setLocal(liftPercent100thsValue);
+        operationalStatus.setLocal({
+          global: WindowCovering.MovementStatus.Stopped,
+          lift: WindowCovering.MovementStatus.Stopped,
+          tilt: WindowCovering.MovementStatus.Stopped,
+        });
+        this.log.info(`Command goToLiftPercentage called. Request: liftPercent100thsValue: ${liftPercent100thsValue} `);
+        this.log.debug(`Command goToLiftPercentage called. Attributes: currentPositionLiftPercent100ths: ${currentPositionLiftPercent100ths?.getLocal()}`);
+        this.log.debug(`Command goToLiftPercentage called. Attributes: targetPositionLiftPercent100ths: ${targetPositionLiftPercent100ths?.getLocal()}`);
+        this.log.debug(`Command goToLiftPercentage called. Attributes: operationalStatus: ${operationalStatus?.getLocal().lift}`);
+      },
+    );
   }
 
   override async onConfigure() {
     this.log.info('onConfigure called');
 
+    const coverCluster = this.cover?.getClusterServer(WindowCovering.Complete);
+    if (coverCluster && coverCluster.getCurrentPositionLiftPercent100thsAttribute) {
+      const position = coverCluster.getCurrentPositionLiftPercent100thsAttribute();
+      if (position === null || position === undefined) return;
+      coverCluster.setTargetPositionLiftPercent100thsAttribute(position);
+      coverCluster.setOperationalStatusAttribute({
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      });
+      this.log.info(`Set cover initial currentPositionLiftPercent100ths and targetPositionLiftPercent100ths to ${position} and operationalStatus to Stopped.`);
+    }
+
     this.coverInterval = setInterval(() => {
       if (!this.cover) return;
-      const coverCluster = this.cover.getClusterServer(WindowCoveringCluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift));
+      const coverCluster = this.cover.getClusterServer(WindowCovering.Complete);
       if (coverCluster && coverCluster.getCurrentPositionLiftPercent100thsAttribute) {
-        let position = coverCluster.getCurrentPositionLiftPercent100thsAttribute()! + 1000;
+        let position = coverCluster.getCurrentPositionLiftPercent100thsAttribute();
+        if (position === null || position === undefined) return;
+        position = position + 1000;
         position = position > 10000 ? 0 : position;
         coverCluster.setTargetPositionLiftPercent100thsAttribute(position);
         coverCluster.setCurrentPositionLiftPercent100thsAttribute(position);
