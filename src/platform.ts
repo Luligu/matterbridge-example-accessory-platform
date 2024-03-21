@@ -59,18 +59,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onConfigure() {
     this.log.info('onConfigure called');
 
-    const coverCluster = this.cover?.getClusterServer(WindowCovering.Complete);
-    if (coverCluster && coverCluster.getCurrentPositionLiftPercent100thsAttribute) {
-      const position = coverCluster.getCurrentPositionLiftPercent100thsAttribute();
-      if (position === null || position === undefined) return;
-      coverCluster.setTargetPositionLiftPercent100thsAttribute(position);
-      coverCluster.setOperationalStatusAttribute({
-        global: WindowCovering.MovementStatus.Stopped,
-        lift: WindowCovering.MovementStatus.Stopped,
-        tilt: WindowCovering.MovementStatus.Stopped,
-      });
-      this.log.info(`Set cover initial currentPositionLiftPercent100ths and targetPositionLiftPercent100ths to ${position} and operationalStatus to Stopped.`);
-    }
+    // Set cover to target = current position and status to stopped (current position is persisted in the cluster)
+    this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
+    this.log.debug('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
     this.coverInterval = setInterval(() => {
       if (!this.cover) return;
