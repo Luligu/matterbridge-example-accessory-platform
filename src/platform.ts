@@ -1,4 +1,4 @@
-import { DeviceTypes, WindowCovering } from 'matterbridge';
+import { DeviceTypes, PlatformConfig, WindowCovering } from 'matterbridge';
 
 import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform } from 'matterbridge';
 import { AnsiLogger } from 'node-ansi-logger';
@@ -7,8 +7,8 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   cover: MatterbridgeDevice | undefined;
   coverInterval: NodeJS.Timeout | undefined;
 
-  constructor(matterbridge: Matterbridge, log: AnsiLogger) {
-    super(matterbridge, log);
+  constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
+    super(matterbridge, log, config);
   }
 
   override async onStart(reason?: string) {

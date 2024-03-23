@@ -1,13 +1,16 @@
-import { Matterbridge } from 'matterbridge';
+import { Matterbridge, PlatformConfig } from 'matterbridge';
 import { AnsiLogger } from 'node-ansi-logger';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
 
 /**
- * This is the standard interface for MatterBridge plugins.
+ * This is the standard interface for Matterbridge plugins.
  * Each plugin should export a default function that follows this signature.
  *
- * @param matterbridge - An instance of MatterBridge
+ * @param {Matterbridge} matterbridge - The Matterbridge instance.
+ * @param {AnsiLogger} log - The logger instance.
+ * @param {PlatformConfig} config - The platform configuration.
+ * @returns {ExampleMatterbridgeAccessoryPlatform} The initialized platform.
  */
-export default function initializePlugin(matterbridge: Matterbridge, log: AnsiLogger) {
-  return new ExampleMatterbridgeAccessoryPlatform(matterbridge, log);
+export default function initializePlugin(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig): ExampleMatterbridgeAccessoryPlatform {
+  return new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
 }
