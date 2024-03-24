@@ -18,7 +18,9 @@
     "matterbridge",
     "homebridge",
     "matter",
-    "matter.js"
+    "matter.js",
+    "example",
+    "plugin"
   ],
   "engines": {
     "node": "^18.19.0 || ^20.11.0"
