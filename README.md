@@ -12,4 +12,6 @@
 
 Matterbridge accessory platform example plugin is a template to develop your own plugin using the accessory platform.
 
+It exposes a cover device that continuously moves position and shows how to use the command handlers (you can control the device).
+
 See the guidelines on [Matterbridge](https://github.com/Luligu/matterbridge/blob/main/README.md) for more information.
