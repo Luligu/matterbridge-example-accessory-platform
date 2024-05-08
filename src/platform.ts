@@ -86,6 +86,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onShutdown(reason?: string) {
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     clearInterval(this.coverInterval);
-    await this.unregisterAllDevices();
+    if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
   }
 }
