@@ -139,6 +139,7 @@ web_modules/
 # jest
 jest.config.mjs
 __test__
+coverage/
 
 # git
 .gitattributes

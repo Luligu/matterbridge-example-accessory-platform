@@ -7,6 +7,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
+    this.log.info('Initializing platform:', this.config.name);
   }
 
   override async onStart(reason?: string) {
