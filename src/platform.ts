@@ -28,32 +28,33 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     });
 
     this.cover.addCommandHandler('stopMotion', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-      const position = currentPositionLiftPercent100ths?.getLocal();
-      if (position !== null && position !== undefined) targetPositionLiftPercent100ths?.setLocal(position);
-      operationalStatus.setLocal({
-        global: WindowCovering.MovementStatus.Stopped,
-        lift: WindowCovering.MovementStatus.Stopped,
-        tilt: WindowCovering.MovementStatus.Stopped,
-      });
-      this.log.debug(`Command stopMotion called. Attributes: currentPositionLiftPercent100ths: ${currentPositionLiftPercent100ths?.getLocal()}`);
-      this.log.debug(`Command stopMotion called. Attributes: targetPositionLiftPercent100ths: ${targetPositionLiftPercent100ths?.getLocal()}`);
-      this.log.debug(`Command stopMotion called. Attributes: operationalStatus: ${operationalStatus?.getLocal().lift}`);
+      this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
+      this.cover?.log.info(
+        `Command stopMotion called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
+      );
+    });
+
+    this.cover.addCommandHandler('upOrOpen', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
+      this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
+      this.cover?.log.info(
+        `Command upOrOpen called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
+      );
+    });
+
+    this.cover.addCommandHandler('downOrClose', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
+      this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
+      this.cover?.log.info(
+        `Command downOrClose called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
+      );
     });
 
     this.cover.addCommandHandler(
       'goToLiftPercentage',
       async ({ request: { liftPercent100thsValue }, attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-        currentPositionLiftPercent100ths?.setLocal(liftPercent100thsValue);
-        targetPositionLiftPercent100ths?.setLocal(liftPercent100thsValue);
-        operationalStatus.setLocal({
-          global: WindowCovering.MovementStatus.Stopped,
-          lift: WindowCovering.MovementStatus.Stopped,
-          tilt: WindowCovering.MovementStatus.Stopped,
-        });
-        this.log.info(`Command goToLiftPercentage called. Request: liftPercent100thsValue: ${liftPercent100thsValue} `);
-        this.log.debug(`Command goToLiftPercentage called. Attributes: currentPositionLiftPercent100ths: ${currentPositionLiftPercent100ths?.getLocal()}`);
-        this.log.debug(`Command goToLiftPercentage called. Attributes: targetPositionLiftPercent100ths: ${targetPositionLiftPercent100ths?.getLocal()}`);
-        this.log.debug(`Command goToLiftPercentage called. Attributes: operationalStatus: ${operationalStatus?.getLocal().lift}`);
+        this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
+        this.cover?.log.info(
+          `Command goToLiftPercentage ${liftPercent100thsValue} called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
+        );
       },
     );
   }
@@ -63,7 +64,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     // Set cover to target = current position and status to stopped (current position is persisted in the cluster)
     this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
-    this.log.debug('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
+    this.log.info('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
     this.coverInterval = setInterval(() => {
       if (!this.cover) return;
