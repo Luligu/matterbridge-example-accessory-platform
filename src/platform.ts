@@ -1,5 +1,6 @@
 import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform, DeviceTypes, PlatformConfig, WindowCovering, powerSource } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
+import os from 'os';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover: MatterbridgeDevice | undefined;
@@ -15,7 +16,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING);
     this.cover.createDefaultIdentifyClusterServer();
-    this.cover.createDefaultBasicInformationClusterServer('Accessory device', '0x59108853', 0xfff1, 'Luligu', 0x0001, 'Accessory device');
+    this.cover.createDefaultBasicInformationClusterServer('Cover device', `0x59108853_${os.hostname()}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
     this.cover.createDefaultWindowCoveringClusterServer(10000);
 
     this.cover.addDeviceType(powerSource);
