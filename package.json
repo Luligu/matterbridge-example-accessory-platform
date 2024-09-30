@@ -1,6 +1,6 @@
 {
   "name": "matterbridge-example-accessory-platform",
-  "version": "1.0.16",
+  "version": "1.0.17-dev.1",
   "description": "Matterbridge accessory plugin",
   "author": "https://github.com/Luligu",
   "license": "MIT",
