@@ -1,6 +1,6 @@
 {
   "name": "matterbridge-example-accessory-platform",
-  "version": "1.0.17-dev.1",
+  "version": "1.0.17",
   "description": "Matterbridge accessory plugin",
   "author": "https://github.com/Luligu",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "deepClean": "npm install --no-save rimraf && rimraf tsconfig.tsbuildinfo package-lock.json npm-shrinkwrap.json ./dist ./node_modules",
     "deepCleanBuild": "npm run deepClean && npm install && npm link matterbridge && npm run build",
     "checkDependencies": "npx npm-check-updates",
-    "updateDependencies": "npx npm-check-updates -u && npm install && npm link matterbridge && npm run cleanBuild",
+    "updateDependencies": "npx npm-check-updates -u && npm run deepCleanBuild",
     "prepublishOnly": "npm shrinkwrap",
     "npmPack": "npm run deepCleanBuild && npm shrinkwrap && npm pack && npm run deepCleanBuild",
     "matterbridge:add": "matterbridge -add .\\",
@@ -75,7 +75,7 @@
     "rimraf": "6.0.1",
     "ts-jest": "29.2.5",
     "typescript": "5.6.2",
-    "typescript-eslint": "8.7.0"
+    "typescript-eslint": "8.8.0"
   },
   "dependencies": {
     "node-ansi-logger": "3.0.0",
