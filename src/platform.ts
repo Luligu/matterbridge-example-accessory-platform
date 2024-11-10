@@ -1,6 +1,18 @@
-import { Matterbridge, MatterbridgeDevice, MatterbridgeAccessoryPlatform, DeviceTypes, PlatformConfig, WindowCovering, powerSource } from 'matterbridge';
+import {
+  Matterbridge,
+  MatterbridgeDevice,
+  // MatterbridgeEndpoint as MatterbridgeDevice,
+  MatterbridgeAccessoryPlatform,
+  DeviceTypes,
+  PlatformConfig,
+  WindowCovering,
+  powerSource,
+  WindowCoveringCluster,
+  TypeFromPartialBitSchema,
+  BitFlag,
+} from 'matterbridge';
+import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
-import os from 'os';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover: MatterbridgeDevice | undefined;
@@ -22,9 +34,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING);
+    this.cover = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
     this.cover.createDefaultIdentifyClusterServer();
-    this.cover.createDefaultBasicInformationClusterServer('Cover device', `0x59108853_${os.hostname()}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
+    this.cover.createDefaultBasicInformationClusterServer('Cover example device', `0x59108853594}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
     this.cover.createDefaultWindowCoveringClusterServer(10000);
 
     this.cover.addDeviceType(powerSource);
@@ -32,66 +44,70 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     await this.registerDevice(this.cover);
 
+    this.cover.subscribeAttribute(
+      WindowCoveringCluster.id,
+      'mode',
+      (
+        newValue: TypeFromPartialBitSchema<{
+          motorDirectionReversed: BitFlag;
+          calibrationMode: BitFlag;
+          maintenanceMode: BitFlag;
+          ledFeedback: BitFlag;
+        }>,
+        oldValue: TypeFromPartialBitSchema<{
+          motorDirectionReversed: BitFlag;
+          calibrationMode: BitFlag;
+          maintenanceMode: BitFlag;
+          ledFeedback: BitFlag;
+        }>,
+      ) => {
+        this.log.info(
+          `Attribute mode changed from ${oldValue} to ${newValue}. Reverse: ${newValue.motorDirectionReversed}. Calibration: ${newValue.calibrationMode}. Maintenance: ${newValue.maintenanceMode}. LED: ${newValue.ledFeedback}`,
+        );
+      },
+      this.log,
+    );
+
     this.cover.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
       this.log.info(`Command identify called identifyTime:${identifyTime}`);
     });
 
-    this.cover.addCommandHandler('stopMotion', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-      this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
-      this.cover?.log.info(
-        `Command stopMotion called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
-      );
+    this.cover.addCommandHandler('stopMotion', async () => {
+      await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
+      this.cover?.log.info(`Command stopMotion called`);
     });
 
-    this.cover.addCommandHandler('upOrOpen', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-      this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
-      this.cover?.log.info(
-        `Command upOrOpen called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
-      );
+    this.cover.addCommandHandler('upOrOpen', async () => {
+      await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
+      this.cover?.log.info(`Command upOrOpen called`);
     });
 
-    this.cover.addCommandHandler('downOrClose', async ({ attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-      this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
-      this.cover?.log.info(
-        `Command downOrClose called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
-      );
+    this.cover.addCommandHandler('downOrClose', async () => {
+      await this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
+      this.cover?.log.info(`Command downOrClose called`);
     });
 
-    this.cover.addCommandHandler(
-      'goToLiftPercentage',
-      async ({ request: { liftPercent100thsValue }, attributes: { currentPositionLiftPercent100ths, targetPositionLiftPercent100ths, operationalStatus } }) => {
-        this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
-        this.cover?.log.info(
-          `Command goToLiftPercentage ${liftPercent100thsValue} called: current ${currentPositionLiftPercent100ths?.getLocal()} target ${targetPositionLiftPercent100ths?.getLocal()} status ${operationalStatus?.getLocal().lift}`,
-        );
-      },
-    );
+    this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
+      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
+      this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
+    });
   }
 
   override async onConfigure() {
     this.log.info('onConfigure called');
 
-    // Set cover to target = current position and status to stopped (current position is persisted in the cluster)
-    this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
+    await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
     this.log.info('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
-    this.coverInterval = setInterval(() => {
+    // Matter: 0 Fully open 10000 fully closed
+    this.coverInterval = setInterval(async () => {
       if (!this.cover) return;
-      const coverCluster = this.cover.getClusterServer(WindowCovering.Complete);
-      if (coverCluster && coverCluster.getCurrentPositionLiftPercent100thsAttribute) {
-        let position = coverCluster.getCurrentPositionLiftPercent100thsAttribute();
-        if (position === null || position === undefined) return;
-        position = position + 1000;
-        position = position > 10000 ? 0 : position;
-        coverCluster.setTargetPositionLiftPercent100thsAttribute(position);
-        coverCluster.setCurrentPositionLiftPercent100thsAttribute(position);
-        coverCluster.setOperationalStatusAttribute({
-          global: WindowCovering.MovementStatus.Stopped,
-          lift: WindowCovering.MovementStatus.Stopped,
-          tilt: WindowCovering.MovementStatus.Stopped,
-        });
-        this.log.info(`Set liftPercent100thsValue to ${position}`);
-      }
+      let position = this.cover.getAttribute(WindowCoveringCluster.id, 'currentPositionLiftPercent100ths', this.log);
+      if (!isValidNumber(position, 0, 10000)) return;
+      position = position + 1000;
+      position = position > 10000 ? 0 : position;
+      await this.cover.setWindowCoveringCurrentTargetStatus(position, position, WindowCovering.MovementStatus.Stopped);
+      this.log.info(`Set liftPercent100thsValue to ${position}`);
     }, 60 * 1000);
   }
 
