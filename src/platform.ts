@@ -13,7 +13,6 @@ import {
   DeviceTypeDefinition,
   AtLeastOne,
   EndpointOptions,
-  MatterbridgeEndpoint,
 } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
@@ -22,11 +21,15 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   cover: MatterbridgeDevice | undefined;
   coverInterval: NodeJS.Timeout | undefined;
 
-  createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): MatterbridgeDevice {
-    let device: MatterbridgeDevice | MatterbridgeEndpoint;
-    if ('edge' in this.matterbridge && this.matterbridge.edge === true) device = new MatterbridgeEndpoint(definition, options, debug);
-    else device = new MatterbridgeDevice(definition, options, debug);
-    return device as unknown as MatterbridgeDevice;
+  async createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): Promise<MatterbridgeDevice> {
+    let device: MatterbridgeDevice;
+    const matterbridge = await import('matterbridge');
+    if ('edge' in this.matterbridge && this.matterbridge.edge === true && 'MatterbridgeEndpoint' in matterbridge) {
+      // Dynamically resolve the MatterbridgeEndpoint class from the imported module and instantiate it without throwing a TypeScript error for old versions of Matterbridge
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      device = new (matterbridge as any).MatterbridgeEndpoint(definition, options, debug) as MatterbridgeDevice;
+    } else device = new MatterbridgeDevice(definition, options, debug);
+    return device;
   }
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
@@ -45,7 +48,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = this.createMutableDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover = await this.createMutableDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
     this.cover.createDefaultIdentifyClusterServer();
     this.cover.createDefaultBasicInformationClusterServer('Cover example device', `0x59108853594}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
     this.cover.createDefaultWindowCoveringClusterServer(10000);
