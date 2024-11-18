@@ -10,6 +10,10 @@ import {
   WindowCoveringCluster,
   TypeFromPartialBitSchema,
   BitFlag,
+  DeviceTypeDefinition,
+  AtLeastOne,
+  EndpointOptions,
+  MatterbridgeEndpoint,
 } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
@@ -17,6 +21,13 @@ import { AnsiLogger } from 'matterbridge/logger';
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover: MatterbridgeDevice | undefined;
   coverInterval: NodeJS.Timeout | undefined;
+
+  createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): MatterbridgeDevice {
+    let device: MatterbridgeDevice | MatterbridgeEndpoint;
+    if ('edge' in this.matterbridge && this.matterbridge.edge === true) device = new MatterbridgeEndpoint(definition, options, debug);
+    else device = new MatterbridgeDevice(definition, options, debug);
+    return device as unknown as MatterbridgeDevice;
+  }
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
@@ -34,7 +45,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = new MatterbridgeDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover = this.createMutableDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
     this.cover.createDefaultIdentifyClusterServer();
     this.cover.createDefaultBasicInformationClusterServer('Cover example device', `0x59108853594}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
     this.cover.createDefaultWindowCoveringClusterServer(10000);
@@ -73,23 +84,31 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     });
 
     this.cover.addCommandHandler('stopMotion', async () => {
-      await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
       this.cover?.log.info(`Command stopMotion called`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((this.matterbridge as any).edge === true) return;
+      await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
     });
 
     this.cover.addCommandHandler('upOrOpen', async () => {
-      await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
       this.cover?.log.info(`Command upOrOpen called`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((this.matterbridge as any).edge === true) return;
+      await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
     });
 
     this.cover.addCommandHandler('downOrClose', async () => {
-      await this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
       this.cover?.log.info(`Command downOrClose called`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((this.matterbridge as any).edge === true) return;
+      await this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
     });
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
       this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((this.matterbridge as any).edge === true) return;
+      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
     });
   }
 
@@ -114,6 +133,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onShutdown(reason?: string) {
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     clearInterval(this.coverInterval);
+    this.coverInterval = undefined;
     if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
   }
 }
