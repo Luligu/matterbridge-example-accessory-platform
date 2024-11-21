@@ -87,29 +87,21 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover.addCommandHandler('stopMotion', async () => {
       this.cover?.log.info(`Command stopMotion called`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((this.matterbridge as any).edge === true) return;
       await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
     });
 
     this.cover.addCommandHandler('upOrOpen', async () => {
       this.cover?.log.info(`Command upOrOpen called`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((this.matterbridge as any).edge === true) return;
       await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
     });
 
     this.cover.addCommandHandler('downOrClose', async () => {
       this.cover?.log.info(`Command downOrClose called`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((this.matterbridge as any).edge === true) return;
       await this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
     });
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
       this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((this.matterbridge as any).edge === true) return;
       await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
     });
   }
