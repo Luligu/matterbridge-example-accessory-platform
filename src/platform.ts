@@ -1,7 +1,6 @@
 import {
   Matterbridge,
   MatterbridgeDevice,
-  // MatterbridgeEndpoint as MatterbridgeDevice,
   MatterbridgeAccessoryPlatform,
   DeviceTypes,
   PlatformConfig,
