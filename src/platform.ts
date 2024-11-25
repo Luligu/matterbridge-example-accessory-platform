@@ -35,9 +35,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.2')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "1.6.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
       );
     }
 
@@ -49,7 +49,18 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover = await this.createMutableDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
     this.cover.createDefaultIdentifyClusterServer();
-    this.cover.createDefaultBasicInformationClusterServer('Cover example device', `0x59108853594}`, 0xfff1, 'Matterbridge', 0x0001, 'Matterbridge Cover');
+    this.cover.createDefaultBasicInformationClusterServer(
+      'Cover example device',
+      `0x59108853594}`,
+      0xfff1,
+      'Matterbridge',
+      0x0001,
+      'Matterbridge Cover',
+      parseInt(this.version.replace(/\D/g, '')),
+      this.version,
+      parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
+      this.matterbridge.matterbridgeVersion,
+    );
     this.cover.createDefaultWindowCoveringClusterServer(10000);
 
     this.cover.addDeviceType(powerSource);
