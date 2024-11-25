@@ -57,7 +57,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       0x0001,
       'Matterbridge Cover',
       parseInt(this.version.replace(/\D/g, '')),
-      this.version,
+      this.version === '' ? 'Unknown' : this.version,
       parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
       this.matterbridge.matterbridgeVersion,
     );
