@@ -93,7 +93,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     );
 
     this.cover.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
-      this.log.info(`Command identify called identifyTime:${identifyTime}`);
+      this.cover?.log.info(`Command identify called identifyTime: ${identifyTime}`);
     });
 
     this.cover.addCommandHandler('stopMotion', async () => {
