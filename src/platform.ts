@@ -37,7 +37,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     // Verify that Matterbridge is the correct version
     if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.2')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend."`,
+        `This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
       );
     }
 
@@ -113,7 +113,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
       this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
-      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
+      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue ?? 0, liftPercent100thsValue ?? 0, WindowCovering.MovementStatus.Stopped);
     });
   }
 
