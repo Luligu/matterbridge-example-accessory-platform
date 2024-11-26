@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ClusterServerObj, IdentifyCluster, Matterbridge, PlatformConfig, WindowCovering, WindowCoveringCluster } from 'matterbridge';
+import { ClusterServerObj, IdentifyCluster, Matterbridge, MatterbridgeDevice, MatterbridgeEndpoint, PlatformConfig, WindowCovering, WindowCoveringCluster } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
+import { wait } from 'matterbridge/utils';
 
 describe('TestPlatform', () => {
   let mockMatterbridge: Matterbridge;
@@ -31,9 +32,15 @@ describe('TestPlatform', () => {
     }
   }
 
-  beforeAll(() => {
+  beforeAll(async () => {
     mockMatterbridge = {
-      addBridgedDevice: jest.fn(),
+      addBridgedDevice: jest.fn(async (pluginName: string, device: MatterbridgeDevice) => {
+        // console.error('addBridgedDevice called');
+      }),
+      addBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {
+        device.number = 100;
+        // console.error('addBridgedEndpoint called');
+      }),
       matterbridgeDirectory: '',
       matterbridgePluginDirectory: 'temp',
       systemInformation: { ipv4Address: undefined },
@@ -68,6 +75,11 @@ describe('TestPlatform', () => {
     consoleLogSpy.mockRestore();
   });
 
+  afterEach(async () => {
+    if (accessoryPlatform) await accessoryPlatform.onShutdown('Test reason');
+    jest.clearAllTimers();
+  });
+
   it('should initialize platform with config name', () => {
     accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(mockMatterbridge, mockLog, mockConfig);
     expect(mockLog.info).toHaveBeenCalledWith('Initializing platform:', mockConfig.name);
@@ -79,6 +91,28 @@ describe('TestPlatform', () => {
       'This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
     mockMatterbridge.matterbridgeVersion = '1.6.2';
+  });
+
+  it('should call onStart in edge mode', async () => {
+    mockMatterbridge.edge = true;
+    await accessoryPlatform.onStart('Test reason');
+    expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
+  }, 60000);
+
+  it('should call onConfigure in edge mode', async () => {
+    jest.useFakeTimers();
+
+    await accessoryPlatform.onConfigure();
+    expect(mockLog.info).toHaveBeenCalledWith('onConfigure called');
+
+    jest.advanceTimersByTime(60 * 1000);
+    jest.useRealTimers();
+  });
+
+  it('should call onShutdown  in edge mode', async () => {
+    await accessoryPlatform.onShutdown('Test reason');
+    expect(mockLog.info).toHaveBeenCalledWith('onShutdown called with reason:', 'Test reason');
+    mockMatterbridge.edge = false;
   });
 
   it('should call onStart with reason', async () => {
@@ -117,7 +151,6 @@ describe('TestPlatform', () => {
     expect(mockLog.info).toHaveBeenCalledWith('onConfigure called');
 
     jest.advanceTimersByTime(60 * 1000);
-
     jest.useRealTimers();
   });
 
