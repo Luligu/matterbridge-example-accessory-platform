@@ -85,7 +85,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
           ledFeedback: BitFlag;
         }>,
       ) => {
-        this.log.info(
+        this.cover?.log.info(
           `Attribute mode changed from ${oldValue} to ${newValue}. Reverse: ${newValue.motorDirectionReversed}. Calibration: ${newValue.calibrationMode}. Maintenance: ${newValue.maintenanceMode}. LED: ${newValue.ledFeedback}`,
         );
       },
@@ -113,7 +113,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
       this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
-      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue ?? 0, liftPercent100thsValue ?? 0, WindowCovering.MovementStatus.Stopped);
+      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
     });
   }
 

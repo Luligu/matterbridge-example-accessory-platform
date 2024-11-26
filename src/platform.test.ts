@@ -4,8 +4,6 @@ import { ClusterServerObj, IdentifyCluster, Matterbridge, PlatformConfig, Window
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
-import { wait } from 'matterbridge/utils';
-import exp from 'constants';
 
 describe('TestPlatform', () => {
   let mockMatterbridge: Matterbridge;
@@ -16,13 +14,21 @@ describe('TestPlatform', () => {
   const log = new AnsiLogger({ logName: 'Jest', logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
   log.logLevel = LogLevel.DEBUG;
 
+  let loggerLogSpy: jest.SpiedFunction<(level: LogLevel, message: string, ...parameters: any[]) => void>;
   let consoleLogSpy: jest.SpiedFunction<typeof console.log>;
 
-  function invokeCommands(cluster: ClusterServerObj): void {
+  async function invokeCommands(cluster: ClusterServerObj): Promise<void> {
     const commands = (cluster as any).commands as object;
-    Object.entries(commands).forEach(([key, value]) => {
-      if (typeof value.handler === 'function') value.handler({});
-    });
+    for (const [key, value] of Object.entries(commands)) {
+      if (typeof value.handler === 'function') await value.handler({});
+    }
+  }
+
+  async function invokeCommand(cluster: ClusterServerObj, command: string, data?: Record<string, boolean | number | bigint | string | object | null | undefined>): Promise<void> {
+    const commands = (cluster as any).commands as object;
+    for (const [key, value] of Object.entries(commands)) {
+      if (key === command && typeof value.handler === 'function') await value.handler(data ?? {});
+    }
   }
 
   beforeAll(() => {
@@ -42,10 +48,24 @@ describe('TestPlatform', () => {
       'debug': false,
     } as PlatformConfig;
 
+    // Spy on and mock the AnsiLogger.log method
+    loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {
+      // console.error(`Mocked AnsiLogger.log: ${level} - ${message}`, ...parameters);
+    });
+
     // Spy on and mock console.log
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((...args: any[]) => {
-      // console.error(args);
+      // console.error('Mocked console.log', args);
     });
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    loggerLogSpy.mockRestore();
+    consoleLogSpy.mockRestore();
   });
 
   it('should initialize platform with config name', () => {
@@ -68,16 +88,26 @@ describe('TestPlatform', () => {
     // Invoke command handlers
     const identify = accessoryPlatform.cover?.getClusterServer(IdentifyCluster);
     expect(identify).toBeDefined();
-    if (identify) invokeCommands(identify as unknown as ClusterServerObj);
+    if (identify) await invokeCommands(identify as unknown as ClusterServerObj);
 
     const cover = accessoryPlatform.cover?.getClusterServer(WindowCoveringCluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift));
     expect(cover).toBeDefined();
-    if (cover) {
-      invokeCommands(cover as unknown as ClusterServerObj);
-      cover.setModeAttribute({ motorDirectionReversed: false, calibrationMode: false, maintenanceMode: false, ledFeedback: false });
-      // eslint-disable-next-line jest/no-conditional-expect
-      expect(mockLog.info).toHaveBeenCalledWith(expect.stringContaining('Attribute mode changed'));
-    }
+    if (!cover) return;
+
+    await invokeCommand(cover as unknown as ClusterServerObj, 'stopMotion');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Command stopMotion called');
+
+    await invokeCommand(cover as unknown as ClusterServerObj, 'upOrOpen');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Command upOrOpen called');
+
+    await invokeCommand(cover as unknown as ClusterServerObj, 'downOrClose');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Command downOrClose called');
+
+    await invokeCommand(cover as unknown as ClusterServerObj, 'goToLiftPercentage', { liftPercent100thsValue: 5000 });
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Command goToLiftPercentage 5000 called');
+
+    cover.setModeAttribute({ motorDirectionReversed: false, calibrationMode: false, maintenanceMode: false, ledFeedback: false });
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Attribute mode changed'));
   });
 
   it('should call onConfigure', async () => {
