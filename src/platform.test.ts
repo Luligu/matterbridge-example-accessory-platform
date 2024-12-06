@@ -4,7 +4,6 @@ import { ClusterServerObj, IdentifyCluster, Matterbridge, MatterbridgeDevice, Ma
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
-import { wait } from 'matterbridge/utils';
 
 describe('TestPlatform', () => {
   let mockMatterbridge: Matterbridge;
@@ -41,13 +40,43 @@ describe('TestPlatform', () => {
         device.number = 100;
         // console.error('addBridgedEndpoint called');
       }),
+      removeBridgedDevice: jest.fn(async (pluginName: string, device: MatterbridgeDevice) => {
+        // console.error('removeBridgedDevice called');
+      }),
+      removeBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {
+        // console.error('removeBridgedEndpoint called');
+      }),
+      removeAllBridgedDevices: jest.fn(async (pluginName: string) => {
+        // console.error('removeAllBridgedDevices called');
+      }),
+      removeAllBridgedEndpoints: jest.fn(async (pluginName: string) => {
+        // console.error('removeAllBridgedEndpoints called');
+      }),
       matterbridgeDirectory: '',
       matterbridgePluginDirectory: 'temp',
       systemInformation: { ipv4Address: undefined },
-      matterbridgeVersion: '1.6.2',
-      removeAllBridgedDevices: jest.fn(),
+      matterbridgeVersion: '1.6.6',
     } as unknown as Matterbridge;
-    mockLog = { fatal: jest.fn(), error: jest.fn(), warn: jest.fn(), notice: jest.fn(), info: jest.fn(), debug: jest.fn() } as unknown as AnsiLogger;
+    mockLog = {
+      fatal: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.fatal', message, parameters);
+      }),
+      error: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.error', message, parameters);
+      }),
+      warn: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.warn', message, parameters);
+      }),
+      notice: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.notice', message, parameters);
+      }),
+      info: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.info', message, parameters);
+      }),
+      debug: jest.fn((message: string, ...parameters: any[]) => {
+        // console.error('mockLog.debug', message, parameters);
+      }),
+    } as unknown as AnsiLogger;
     mockConfig = {
       'name': 'matterbridge-example-accessory-platform',
       'type': 'AccessoryPlatform',
@@ -88,13 +117,14 @@ describe('TestPlatform', () => {
   it('should throw error in load when version is not valid', () => {
     mockMatterbridge.matterbridgeVersion = '1.5.0';
     expect(() => new ExampleMatterbridgeAccessoryPlatform(mockMatterbridge, mockLog, mockConfig)).toThrow(
-      'This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
+      'This plugin requires Matterbridge version >= "1.6.6". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    mockMatterbridge.matterbridgeVersion = '1.6.2';
+    mockMatterbridge.matterbridgeVersion = '1.6.6';
   });
 
   it('should call onStart in edge mode', async () => {
     mockMatterbridge.edge = true;
+    accessoryPlatform.version = '1.6.6';
     await accessoryPlatform.onStart('Test reason');
     expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
   }, 60000);
@@ -116,6 +146,7 @@ describe('TestPlatform', () => {
   });
 
   it('should call onStart with reason', async () => {
+    accessoryPlatform.version = '1.6.6';
     await accessoryPlatform.onStart('Test reason');
     expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
 

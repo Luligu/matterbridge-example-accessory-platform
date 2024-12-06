@@ -12,6 +12,7 @@ import {
   DeviceTypeDefinition,
   AtLeastOne,
   EndpointOptions,
+  MatterbridgeEndpoint,
 } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
@@ -22,12 +23,8 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
   async createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): Promise<MatterbridgeDevice> {
     let device: MatterbridgeDevice;
-    const matterbridge = await import('matterbridge');
-    if ('edge' in this.matterbridge && this.matterbridge.edge === true && 'MatterbridgeEndpoint' in matterbridge) {
-      // Dynamically resolve the MatterbridgeEndpoint class from the imported module and instantiate it without throwing a TypeScript error for old versions of Matterbridge
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      device = new (matterbridge as any).MatterbridgeEndpoint(definition, options, debug) as MatterbridgeDevice;
-    } else device = new MatterbridgeDevice(definition, options, debug);
+    if (this.matterbridge.edge === true) device = new MatterbridgeEndpoint(definition, options, debug) as unknown as MatterbridgeDevice;
+    else device = new MatterbridgeDevice(definition, options, debug);
     return device;
   }
 
@@ -35,9 +32,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.2')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.6')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "1.6.2". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
+        `This plugin requires Matterbridge version >= "1.6.6". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
       );
     }
 
@@ -57,7 +54,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       0x0001,
       'Matterbridge Cover',
       parseInt(this.version.replace(/\D/g, '')),
-      this.version === '' ? 'Unknown' : this.version,
+      this.version,
       parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
       this.matterbridge.matterbridgeVersion,
     );
