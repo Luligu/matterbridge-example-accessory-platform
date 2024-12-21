@@ -2,7 +2,6 @@ import {
   Matterbridge,
   MatterbridgeDevice,
   MatterbridgeAccessoryPlatform,
-  DeviceTypes,
   PlatformConfig,
   WindowCovering,
   powerSource,
@@ -13,6 +12,7 @@ import {
   AtLeastOne,
   EndpointOptions,
   MatterbridgeEndpoint,
+  coverDevice,
 } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
@@ -44,7 +44,8 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = await this.createMutableDevice(DeviceTypes.WINDOW_COVERING, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover = await this.createMutableDevice(coverDevice, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover.log.logName = 'Cover example device';
     this.cover.createDefaultIdentifyClusterServer();
     this.cover.createDefaultBasicInformationClusterServer(
       'Cover example device',
@@ -115,6 +116,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   }
 
   override async onConfigure() {
+    await super.onConfigure();
     this.log.info('onConfigure called');
 
     await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
@@ -133,6 +135,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   }
 
   override async onShutdown(reason?: string) {
+    await super.onShutdown(reason);
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     clearInterval(this.coverInterval);
     this.coverInterval = undefined;
