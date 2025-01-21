@@ -1,6 +1,5 @@
 import {
   Matterbridge,
-  MatterbridgeDevice,
   MatterbridgeAccessoryPlatform,
   PlatformConfig,
   WindowCovering,
@@ -8,9 +7,6 @@ import {
   WindowCoveringCluster,
   TypeFromPartialBitSchema,
   BitFlag,
-  DeviceTypeDefinition,
-  AtLeastOne,
-  EndpointOptions,
   MatterbridgeEndpoint,
   coverDevice,
 } from 'matterbridge';
@@ -18,23 +14,16 @@ import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
-  cover: MatterbridgeDevice | undefined;
-  coverInterval: NodeJS.Timeout | undefined;
-
-  async createMutableDevice(definition: DeviceTypeDefinition | AtLeastOne<DeviceTypeDefinition>, options: EndpointOptions = {}, debug = false): Promise<MatterbridgeDevice> {
-    let device: MatterbridgeDevice;
-    if (this.matterbridge.edge === true) device = new MatterbridgeEndpoint(definition, options, debug) as unknown as MatterbridgeDevice;
-    else device = new MatterbridgeDevice(definition, options, debug);
-    return device;
-  }
+  cover?: MatterbridgeEndpoint;
+  coverInterval?: NodeJS.Timeout;
 
   constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('1.6.6')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('2.0.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "1.6.6". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
+        `This plugin requires Matterbridge version >= "2.0.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
       );
     }
 
@@ -44,12 +33,12 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = await this.createMutableDevice(coverDevice, { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
     this.cover.log.logName = 'Cover example device';
     this.cover.createDefaultIdentifyClusterServer();
     this.cover.createDefaultBasicInformationClusterServer(
       'Cover example device',
-      `0x59108853594}`,
+      `0x59108853594`,
       0xfff1,
       'Matterbridge',
       0x0001,
@@ -61,7 +50,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     );
     this.cover.createDefaultWindowCoveringClusterServer(10000);
 
-    this.cover.addDeviceType(powerSource);
     this.cover.createDefaultPowerSourceWiredClusterServer();
 
     await this.registerDevice(this.cover);
@@ -110,7 +98,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     });
 
     this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
-      this.cover?.log.info(`Command goToLiftPercentage ${liftPercent100thsValue} called`);
+      this.cover?.log.info(`Command goToLiftPercentage called request ${liftPercent100thsValue}`);
       await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
     });
   }
@@ -135,10 +123,10 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   }
 
   override async onShutdown(reason?: string) {
-    await super.onShutdown(reason);
-    this.log.info('onShutdown called with reason:', reason ?? 'none');
     clearInterval(this.coverInterval);
     this.coverInterval = undefined;
+    await super.onShutdown(reason);
+    this.log.info('onShutdown called with reason:', reason ?? 'none');
     if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
   }
 }
