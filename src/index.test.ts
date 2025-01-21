@@ -2,12 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Matterbridge, MatterbridgeEndpoint, PlatformConfig, bridge } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { StorageContext, ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, DeviceTypeId, VendorId, MdnsService } from 'matterbridge/matter';
+import { ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
 import initializePlugin from './index';
 import { jest } from '@jest/globals';
-import { wait } from 'matterbridge/utils';
 
 describe('initializePlugin', () => {
   let matterbridge: Matterbridge;

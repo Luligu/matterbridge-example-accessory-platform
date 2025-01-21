@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { bridge, Descriptor, Identify, Matterbridge, MatterbridgeEndpoint, PlatformConfig, PowerSource, WindowCovering } from 'matterbridge';
-import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { StorageContext, ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, DeviceTypeId, VendorId, MdnsService } from 'matterbridge/matter';
+import { bridge, Identify, Matterbridge, MatterbridgeEndpoint, PlatformConfig, PowerSource, WindowCovering } from 'matterbridge';
+import { AnsiLogger, db, LogLevel, TimestampFormat } from 'matterbridge/logger';
+import { ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
-import { wait } from 'matterbridge/utils';
+import { log } from 'console';
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
@@ -54,6 +54,7 @@ describe('TestPlatform', () => {
     }),
     addBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {
       // console.log('addBridgedEndpoint called');
+      await aggregator.add(device);
     }),
     removeBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {
       // console.log('removeBridgedEndpoint called');
@@ -170,10 +171,9 @@ describe('TestPlatform', () => {
     accessoryPlatform.version = '1.6.6';
     await accessoryPlatform.onStart('Test reason');
     expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
+    expect(mockLog.info).toHaveBeenCalledWith(expect.stringContaining(`${db}Subscribe endpoint`));
 
     expect(accessoryPlatform.cover).toBeDefined();
-
-    if (accessoryPlatform.cover) await aggregator.add(accessoryPlatform.cover);
 
     expect(accessoryPlatform.cover?.hasClusterServer(Identify.Cluster)).toBeTruthy();
     expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering.Cluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift))).toBeTruthy();
@@ -195,7 +195,7 @@ describe('TestPlatform', () => {
     await accessoryPlatform.cover?.commandHandler.executeHandler('goToLiftPercentage', { request: { liftPercent100thsValue: 100 } } as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called'));
 
-    // loggerLogSpy.mockClear();
+    loggerLogSpy.mockClear();
     // Trigger subscribe attribute handler
     await accessoryPlatform.cover?.setAttribute(
       WindowCovering.Cluster.id,
