@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Matterbridge, MatterbridgeEndpoint, PlatformConfig, bridge } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { StorageContext, ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, DeviceTypeId, VendorId } from 'matterbridge/matter';
+import { StorageContext, ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, DeviceTypeId, VendorId, MdnsService } from 'matterbridge/matter';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
 import initializePlugin from './index';
@@ -11,7 +11,6 @@ import { wait } from 'matterbridge/utils';
 
 describe('initializePlugin', () => {
   let matterbridge: Matterbridge;
-  let context: StorageContext;
   let server: ServerNode<ServerNode.RootEndpoint>;
   let aggregator: Endpoint<AggregatorEndpoint>;
   let device: MatterbridgeEndpoint;
@@ -105,8 +104,8 @@ describe('initializePlugin', () => {
     matterbridge.environment.vars.set('log.level', Level.DEBUG);
     matterbridge.environment.vars.set('log.format', Format.ANSI);
     matterbridge.environment.vars.set('path.root', 'matterstorage');
-    matterbridge.environment.vars.set('runtime.signals', true);
-    matterbridge.environment.vars.set('runtime.exitcode', true);
+    matterbridge.environment.vars.set('runtime.signals', false);
+    matterbridge.environment.vars.set('runtime.exitcode', false);
     if (matterbridge.mdnsInterface) matterbridge.environment.vars.set('mdns.networkInterface', matterbridge.mdnsInterface);
   });
 
@@ -122,40 +121,31 @@ describe('initializePlugin', () => {
   afterAll(async () => {
     // Close the Matterbridge instance
     await matterbridge.destroyInstance();
+    await matterbridge.environment.get(MdnsService)[Symbol.asyncDispose]();
 
     // Restore all mocks
     jest.restoreAllMocks();
   }, 30000);
 
-  it('should create the context', async () => {
+  it('should create the storage context', async () => {
     await (matterbridge as any).startMatterStorage();
-    context = await (matterbridge as any).createServerNodeContext(
-      'Jest',
-      deviceType.name,
-      DeviceTypeId(deviceType.code),
-      VendorId(0xfff1),
-      'Matterbridge',
-      0x8000,
-      'Matterbridge ' + deviceType.name.replace('MA-', ''),
-    );
-    expect(context).toBeDefined();
+    expect(matterbridge.matterStorageService).toBeDefined();
+    expect(matterbridge.matterStorageManager).toBeDefined();
+    expect(matterbridge.matterbridgeContext).toBeDefined();
   });
 
   it('should create the server', async () => {
-    server = await (matterbridge as any).createServerNode(context);
+    server = await (matterbridge as any).createServerNode(matterbridge.matterbridgeContext);
     expect(server).toBeDefined();
   });
 
   it('should create the aggregator', async () => {
-    aggregator = await (matterbridge as any).createAggregatorNode(context);
+    aggregator = await (matterbridge as any).createAggregatorNode(matterbridge.matterbridgeContext);
     expect(aggregator).toBeDefined();
-    await server.add(aggregator);
-    await server.start();
   });
 
   it('should add the aggregator to the server', async () => {
     expect(await server.add(aggregator)).toBeDefined();
-    await server.start();
   });
 
   it('should start the server', async () => {
@@ -173,5 +163,12 @@ describe('initializePlugin', () => {
   it('should stop the server', async () => {
     await server.close();
     expect(server.lifecycle.isOnline).toBe(false);
+  });
+
+  it('should stop the storage', async () => {
+    await (matterbridge as any).stopMatterStorage();
+    expect(matterbridge.matterStorageService).not.toBeDefined();
+    expect(matterbridge.matterStorageManager).not.toBeDefined();
+    expect(matterbridge.matterbridgeContext).not.toBeDefined();
   });
 });

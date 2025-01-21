@@ -9,7 +9,6 @@ import { wait } from 'matterbridge/utils';
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
-  let context: StorageContext;
   let server: ServerNode<ServerNode.RootEndpoint>;
   let aggregator: Endpoint<AggregatorEndpoint>;
   let device: MatterbridgeEndpoint;
@@ -105,8 +104,8 @@ describe('TestPlatform', () => {
     matterbridge.environment.vars.set('log.level', Level.DEBUG);
     matterbridge.environment.vars.set('log.format', Format.ANSI);
     matterbridge.environment.vars.set('path.root', 'matterstorage');
-    matterbridge.environment.vars.set('runtime.signals', true);
-    matterbridge.environment.vars.set('runtime.exitcode', true);
+    matterbridge.environment.vars.set('runtime.signals', false);
+    matterbridge.environment.vars.set('runtime.exitcode', false);
     if (matterbridge.mdnsInterface) matterbridge.environment.vars.set('mdns.networkInterface', matterbridge.mdnsInterface);
   });
 
@@ -122,6 +121,7 @@ describe('TestPlatform', () => {
   afterAll(async () => {
     // Close the Matterbridge instance
     await matterbridge.destroyInstance();
+    await matterbridge.environment.get(MdnsService)[Symbol.asyncDispose]();
 
     // Restore all mocks
     jest.restoreAllMocks();
@@ -129,33 +129,23 @@ describe('TestPlatform', () => {
 
   it('should create the context', async () => {
     await (matterbridge as any).startMatterStorage();
-    context = await (matterbridge as any).createServerNodeContext(
-      'Jest',
-      deviceType.name,
-      DeviceTypeId(deviceType.code),
-      VendorId(0xfff1),
-      'Matterbridge',
-      0x8000,
-      'Matterbridge ' + deviceType.name.replace('MA-', ''),
-    );
-    expect(context).toBeDefined();
+    expect(matterbridge.matterStorageService).toBeDefined();
+    expect(matterbridge.matterStorageManager).toBeDefined();
+    expect(matterbridge.matterbridgeContext).toBeDefined();
   });
 
   it('should create the server', async () => {
-    server = await (matterbridge as any).createServerNode(context);
+    server = await (matterbridge as any).createServerNode(matterbridge.matterbridgeContext);
     expect(server).toBeDefined();
   });
 
   it('should create the aggregator', async () => {
-    aggregator = await (matterbridge as any).createAggregatorNode(context);
+    aggregator = await (matterbridge as any).createAggregatorNode(matterbridge.matterbridgeContext);
     expect(aggregator).toBeDefined();
-    await server.add(aggregator);
-    await server.start();
   });
 
   it('should add the aggregator to the server', async () => {
     expect(await server.add(aggregator)).toBeDefined();
-    await server.start();
   });
 
   it('should start the server', async () => {
@@ -192,16 +182,20 @@ describe('TestPlatform', () => {
     // Invoke command handlers
     await accessoryPlatform.cover?.commandHandler.executeHandler('identify', { request: { identifyTime: 1 } } as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command identify called'));
+
     await accessoryPlatform.cover?.commandHandler.executeHandler('stopMotion', {} as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command stopMotion called'));
+
     await accessoryPlatform.cover?.commandHandler.executeHandler('upOrOpen', {} as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command upOrOpen called'));
+
     await accessoryPlatform.cover?.commandHandler.executeHandler('downOrClose', {} as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command downOrClose called'));
+
     await accessoryPlatform.cover?.commandHandler.executeHandler('goToLiftPercentage', { request: { liftPercent100thsValue: 100 } } as any);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called'));
 
-    loggerLogSpy.mockClear();
+    // loggerLogSpy.mockClear();
     // Trigger subscribe attribute handler
     await accessoryPlatform.cover?.setAttribute(
       WindowCovering.Cluster.id,
@@ -243,5 +237,12 @@ describe('TestPlatform', () => {
   it('should stop the server', async () => {
     await server.close();
     expect(server.lifecycle.isOnline).toBe(false);
-  }, 30000);
+  });
+
+  it('should stop the storage', async () => {
+    await (matterbridge as any).stopMatterStorage();
+    expect(matterbridge.matterStorageService).not.toBeDefined();
+    expect(matterbridge.matterStorageManager).not.toBeDefined();
+    expect(matterbridge.matterbridgeContext).not.toBeDefined();
+  });
 });
