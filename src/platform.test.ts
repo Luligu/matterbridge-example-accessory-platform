@@ -122,7 +122,6 @@ describe('TestPlatform', () => {
   afterAll(async () => {
     // Close the Matterbridge instance
     await matterbridge.destroyInstance();
-    await matterbridge.environment.get(MdnsService)[Symbol.asyncDispose]();
 
     // Restore all mocks
     jest.restoreAllMocks();
@@ -150,7 +149,7 @@ describe('TestPlatform', () => {
   });
 
   it('should start the server', async () => {
-    await server.start();
+    await (matterbridge as any).startServerNode(server);
     expect(server.lifecycle.isOnline).toBe(true);
   });
 
@@ -235,7 +234,7 @@ describe('TestPlatform', () => {
   });
 
   it('should stop the server', async () => {
-    await server.close();
+    await (matterbridge as any).stopServerNode(server);
     expect(server.lifecycle.isOnline).toBe(false);
   });
 
