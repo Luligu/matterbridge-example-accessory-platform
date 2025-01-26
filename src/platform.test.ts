@@ -5,7 +5,6 @@ import { AnsiLogger, db, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
-import { log } from 'console';
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
