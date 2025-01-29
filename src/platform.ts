@@ -1,15 +1,4 @@
-import {
-  Matterbridge,
-  MatterbridgeAccessoryPlatform,
-  PlatformConfig,
-  WindowCovering,
-  powerSource,
-  WindowCoveringCluster,
-  TypeFromPartialBitSchema,
-  BitFlag,
-  MatterbridgeEndpoint,
-  coverDevice,
-} from 'matterbridge';
+import { Matterbridge, MatterbridgeAccessoryPlatform, PlatformConfig, WindowCovering, powerSource, WindowCoveringCluster, MatterbridgeEndpoint, coverDevice } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
 
@@ -53,30 +42,6 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.cover.createDefaultPowerSourceWiredClusterServer();
 
     await this.registerDevice(this.cover);
-
-    this.cover.subscribeAttribute(
-      WindowCoveringCluster.id,
-      'mode',
-      (
-        newValue: TypeFromPartialBitSchema<{
-          motorDirectionReversed: BitFlag;
-          calibrationMode: BitFlag;
-          maintenanceMode: BitFlag;
-          ledFeedback: BitFlag;
-        }>,
-        oldValue: TypeFromPartialBitSchema<{
-          motorDirectionReversed: BitFlag;
-          calibrationMode: BitFlag;
-          maintenanceMode: BitFlag;
-          ledFeedback: BitFlag;
-        }>,
-      ) => {
-        this.cover?.log.info(
-          `Attribute mode changed from ${oldValue} to ${newValue}. Reverse: ${newValue.motorDirectionReversed}. Calibration: ${newValue.calibrationMode}. Maintenance: ${newValue.maintenanceMode}. LED: ${newValue.ledFeedback}`,
-        );
-      },
-      this.log,
-    );
 
     this.cover.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
       this.cover?.log.info(`Command identify called identifyTime: ${identifyTime}`);

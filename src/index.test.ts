@@ -151,11 +151,12 @@ describe('initializePlugin', () => {
     expect(server.lifecycle.isOnline).toBe(true);
   });
 
-  it('should return an instance of TestPlatform', () => {
+  it('should return an instance of TestPlatform', async () => {
     const result = initializePlugin(mockMatterbridge, mockLog, mockConfig);
-
     expect(result).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
     expect(mockLog.info).toHaveBeenCalledWith('Initializing platform:', mockConfig.name);
+    await result.onShutdown();
+    expect(mockLog.info).toHaveBeenCalledWith('onShutdown called with reason:', 'none');
   });
 
   it('should stop the server', async () => {

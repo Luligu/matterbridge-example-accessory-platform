@@ -3,6 +3,7 @@
 import { bridge, Identify, Matterbridge, MatterbridgeEndpoint, PlatformConfig, PowerSource, WindowCovering } from 'matterbridge';
 import { AnsiLogger, db, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
+
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
 
@@ -169,7 +170,6 @@ describe('TestPlatform', () => {
     accessoryPlatform.version = '1.6.6';
     await accessoryPlatform.onStart('Test reason');
     expect(mockLog.info).toHaveBeenCalledWith('onStart called with reason:', 'Test reason');
-    expect(mockLog.info).toHaveBeenCalledWith(expect.stringContaining(`${db}Subscribed endpoint`));
 
     expect(accessoryPlatform.cover).toBeDefined();
 
@@ -192,21 +192,6 @@ describe('TestPlatform', () => {
 
     await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 });
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called request 100'));
-
-    loggerLogSpy.mockClear();
-    // Trigger subscribe attribute handler
-    await accessoryPlatform.cover?.setAttribute(
-      WindowCovering.Cluster.id,
-      'mode',
-      {
-        motorDirectionReversed: false,
-        calibrationMode: false,
-        maintenanceMode: false,
-        ledFeedback: false,
-      },
-      accessoryPlatform.cover?.log,
-    );
-    // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Attribute mode changed'));
   }, 30000);
 
   it('should call onConfigure', async () => {
