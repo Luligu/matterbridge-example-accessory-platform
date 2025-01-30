@@ -1,6 +1,7 @@
-import { Matterbridge, MatterbridgeAccessoryPlatform, PlatformConfig, WindowCovering, powerSource, WindowCoveringCluster, MatterbridgeEndpoint, coverDevice } from 'matterbridge';
+import { Matterbridge, MatterbridgeAccessoryPlatform, PlatformConfig, powerSource, MatterbridgeEndpoint, coverDevice } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
+import { WindowCovering } from 'matterbridge/matter/clusters';
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover?: MatterbridgeEndpoint;
@@ -78,7 +79,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     // Matter: 0 Fully open 10000 fully closed
     this.coverInterval = setInterval(async () => {
       if (!this.cover) return;
-      let position = this.cover.getAttribute(WindowCoveringCluster.id, 'currentPositionLiftPercent100ths', this.log);
+      let position = this.cover.getAttribute(WindowCovering.Cluster.id, 'currentPositionLiftPercent100ths', this.log);
       if (!isValidNumber(position, 0, 10000)) return;
       position = position + 1000;
       position = position > 10000 ? 0 : position;

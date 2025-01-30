@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { bridge, Identify, Matterbridge, MatterbridgeEndpoint, PlatformConfig, PowerSource, WindowCovering } from 'matterbridge';
-import { AnsiLogger, db, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { ServerNode, Endpoint, AggregatorEndpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
+import { bridge, Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
+import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
+import { ServerNode, Endpoint, LogLevel as Level, LogFormat as Format } from 'matterbridge/matter';
+import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
+import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
