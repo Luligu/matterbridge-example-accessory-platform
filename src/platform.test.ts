@@ -8,6 +8,7 @@ import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clust
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform';
 import { jest } from '@jest/globals';
+import { MdnsService } from 'matterbridge/matter';
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
@@ -109,7 +110,6 @@ describe('TestPlatform', () => {
     matterbridge.environment.vars.set('path.root', 'matterstorage');
     matterbridge.environment.vars.set('runtime.signals', false);
     matterbridge.environment.vars.set('runtime.exitcode', false);
-    if (matterbridge.mdnsInterface) matterbridge.environment.vars.set('mdns.networkInterface', matterbridge.mdnsInterface);
   });
 
   beforeEach(async () => {
@@ -222,6 +222,7 @@ describe('TestPlatform', () => {
   it('should stop the server', async () => {
     await (matterbridge as any).stopServerNode(server);
     expect(server.lifecycle.isOnline).toBe(false);
+    await server.env.get(MdnsService)[Symbol.asyncDispose]();
   });
 
   it('should stop the storage', async () => {
@@ -229,5 +230,5 @@ describe('TestPlatform', () => {
     expect(matterbridge.matterStorageService).not.toBeDefined();
     expect(matterbridge.matterStorageManager).not.toBeDefined();
     expect(matterbridge.matterbridgeContext).not.toBeDefined();
-  });
+  }, 10000);
 });

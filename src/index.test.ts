@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Matterbridge, MatterbridgeEndpoint, PlatformConfig, bridge } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { ServerNode, Endpoint, LogLevel as Level, LogFormat as Format } from 'matterbridge/matter';
+import { ServerNode, Endpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
 import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
@@ -162,6 +162,7 @@ describe('initializePlugin', () => {
   it('should stop the server', async () => {
     await (matterbridge as any).stopServerNode(server);
     expect(server.lifecycle.isOnline).toBe(false);
+    await server.env.get(MdnsService)[Symbol.asyncDispose]();
   });
 
   it('should stop the storage', async () => {
