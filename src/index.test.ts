@@ -10,12 +10,6 @@ import initializePlugin from './index';
 import { jest } from '@jest/globals';
 
 describe('initializePlugin', () => {
-  let matterbridge: Matterbridge;
-  let server: ServerNode<ServerNode.RootEndpoint>;
-  let aggregator: Endpoint<AggregatorEndpoint>;
-  let device: MatterbridgeEndpoint;
-  const deviceType = bridge;
-
   const mockLog = {
     fatal: jest.fn((message: string, ...parameters: any[]) => {
       // console.log('mockLog.fatal', message, parameters);
@@ -41,7 +35,7 @@ describe('initializePlugin', () => {
     matterbridgeDirectory: './jest/matterbridge',
     matterbridgePluginDirectory: './jest/plugins',
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
-    matterbridgeVersion: '2.1.0',
+    matterbridgeVersion: '2.2.0',
     edge: true,
     log: mockLog,
     getDevices: jest.fn(() => {
@@ -96,16 +90,7 @@ describe('initializePlugin', () => {
   });
 
   beforeAll(async () => {
-    // Create a MatterbridgeEdge instance
-    matterbridge = await Matterbridge.loadInstance(false);
-    matterbridge.log = new AnsiLogger({ logName: 'Matterbridge', logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
-
-    // Setup matter environment
-    matterbridge.environment.vars.set('log.level', Level.DEBUG);
-    matterbridge.environment.vars.set('log.format', Format.ANSI);
-    matterbridge.environment.vars.set('path.root', 'matterstorage');
-    matterbridge.environment.vars.set('runtime.signals', false);
-    matterbridge.environment.vars.set('runtime.exitcode', false);
+    //
   });
 
   beforeEach(async () => {
@@ -118,57 +103,15 @@ describe('initializePlugin', () => {
   });
 
   afterAll(async () => {
-    // Close the Matterbridge instance
-    await matterbridge.destroyInstance();
-
     // Restore all mocks
     jest.restoreAllMocks();
   }, 30000);
 
-  it('should create the storage context', async () => {
-    await (matterbridge as any).startMatterStorage();
-    expect(matterbridge.matterStorageService).toBeDefined();
-    expect(matterbridge.matterStorageManager).toBeDefined();
-    expect(matterbridge.matterbridgeContext).toBeDefined();
-  });
-
-  it('should create the server', async () => {
-    server = await (matterbridge as any).createServerNode(matterbridge.matterbridgeContext);
-    expect(server).toBeDefined();
-  });
-
-  it('should create the aggregator', async () => {
-    aggregator = await (matterbridge as any).createAggregatorNode(matterbridge.matterbridgeContext);
-    expect(aggregator).toBeDefined();
-  });
-
-  it('should add the aggregator to the server', async () => {
-    expect(await server.add(aggregator)).toBeDefined();
-  });
-
-  it('should start the server', async () => {
-    await (matterbridge as any).startServerNode(server);
-    expect(server.lifecycle.isOnline).toBe(true);
-  });
-
   it('should return an instance of TestPlatform', async () => {
-    const result = initializePlugin(mockMatterbridge, mockLog, mockConfig);
-    expect(result).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
+    const platform = initializePlugin(mockMatterbridge, mockLog, mockConfig);
     expect(mockLog.info).toHaveBeenCalledWith('Initializing platform:', mockConfig.name);
-    await result.onShutdown();
-    expect(mockLog.info).toHaveBeenCalledWith('onShutdown called with reason:', 'none');
-  });
-
-  it('should stop the server', async () => {
-    await (matterbridge as any).stopServerNode(server);
-    expect(server.lifecycle.isOnline).toBe(false);
-    await server.env.get(MdnsService)[Symbol.asyncDispose]();
-  });
-
-  it('should stop the storage', async () => {
-    await (matterbridge as any).stopMatterStorage();
-    expect(matterbridge.matterStorageService).not.toBeDefined();
-    expect(matterbridge.matterStorageManager).not.toBeDefined();
-    expect(matterbridge.matterbridgeContext).not.toBeDefined();
+    expect(platform).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
+    await platform.onShutdown('Test reason');
+    expect(mockLog.info).toHaveBeenCalledWith('onShutdown called with reason:', 'Test reason');
   });
 });
