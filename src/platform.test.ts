@@ -74,30 +74,53 @@ describe('TestPlatform', () => {
     'debug': true,
   } as PlatformConfig;
 
-  // Spy on and mock AnsiLogger.log
-  const loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {
-    //
-  });
-  // Spy on and mock console.log
-  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((...args: any[]) => {
-    //
-  });
-  // Spy on and mock console.log
-  const consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation((...args: any[]) => {
-    //
-  });
-  // Spy on and mock console.log
-  const consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation((...args: any[]) => {
-    //
-  });
-  // Spy on and mock console.log
-  const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: any[]) => {
-    //
-  });
-  // Spy on and mock console.log
-  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args: any[]) => {
-    //
-  });
+  let loggerLogSpy: jest.SpiedFunction<typeof AnsiLogger.prototype.log>;
+  let consoleLogSpy: jest.SpiedFunction<typeof console.log>;
+  let consoleDebugSpy: jest.SpiedFunction<typeof console.log>;
+  let consoleInfoSpy: jest.SpiedFunction<typeof console.log>;
+  let consoleWarnSpy: jest.SpiedFunction<typeof console.log>;
+  let consoleErrorSpy: jest.SpiedFunction<typeof console.log>;
+  const debug = true;
+
+  if (!debug) {
+    // Spy on and mock AnsiLogger.log
+    loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {
+      //
+    });
+    // Spy on and mock console.log
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((...args: any[]) => {
+      //
+    });
+    // Spy on and mock console.debug
+    consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation((...args: any[]) => {
+      //
+    });
+    // Spy on and mock console.info
+    consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation((...args: any[]) => {
+      //
+    });
+    // Spy on and mock console.warn
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: any[]) => {
+      //
+    });
+    // Spy on and mock console.error
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args: any[]) => {
+      //
+    });
+  } else {
+    // Spy on AnsiLogger.log
+    loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log');
+    // Spy on console.log
+    consoleLogSpy = jest.spyOn(console, 'log');
+    // Spy on console.debug
+    consoleDebugSpy = jest.spyOn(console, 'debug');
+    // Spy on console.info
+    consoleInfoSpy = jest.spyOn(console, 'info');
+    // Spy on console.warn
+    consoleWarnSpy = jest.spyOn(console, 'warn');
+    // Spy on console.error
+    consoleErrorSpy = jest.spyOn(console, 'error');
+  }
 
   beforeAll(async () => {
     // Create a MatterbridgeEdge instance
@@ -197,21 +220,31 @@ describe('TestPlatform', () => {
   }, 30000);
 
   it('should call onConfigure', async () => {
-    jest.useFakeTimers();
+    const config: FakeTimersConfig = {};
+    jest.useFakeTimers({ legacyFakeTimers: false });
 
     await accessoryPlatform.onConfigure();
     expect(mockLog.info).toHaveBeenCalledWith('onConfigure called');
     expect(mockLog.info).toHaveBeenCalledWith('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
     for (let i = 0; i < 10; i++) {
-      jest.advanceTimersByTime(30 * 1000);
-      await Promise.resolve();
+      jest.advanceTimersByTime(60 * 1000);
     }
 
+    expect(loggerLogSpy).toHaveBeenCalledTimes(4);
+    expect(mockLog.info).toHaveBeenCalledTimes(12);
     // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
     // expect(mockLog.info).toHaveBeenCalledWith(expect.stringContaining('Set liftPercent100thsValue to'));
 
     jest.useRealTimers();
+
+    // Log all calls to loggerLogSpy
+    /*
+    consoleLogSpy.mockRestore();
+    loggerLogSpy.mock.calls.forEach((call, index) => {
+      console.log(`Call ${index + 1}:`, call);
+    });
+    */
   });
 
   it('should call onShutdown with reason', async () => {
