@@ -44,7 +44,7 @@ describe('TestPlatform', () => {
     matterbridgeDirectory: './jest/matterbridge',
     matterbridgePluginDirectory: './jest/plugins',
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
-    matterbridgeVersion: '2.2.0',
+    matterbridgeVersion: '2.2.7',
     edge: true,
     log: mockLog,
     getDevices: jest.fn(() => {
@@ -80,7 +80,7 @@ describe('TestPlatform', () => {
   let consoleInfoSpy: jest.SpiedFunction<typeof console.log>;
   let consoleWarnSpy: jest.SpiedFunction<typeof console.log>;
   let consoleErrorSpy: jest.SpiedFunction<typeof console.log>;
-  const debug = true;
+  const debug = false;
 
   if (!debug) {
     // Spy on and mock AnsiLogger.log
@@ -181,9 +181,9 @@ describe('TestPlatform', () => {
   it('should throw error in load when version is not valid', () => {
     mockMatterbridge.matterbridgeVersion = '1.5.0';
     expect(() => new ExampleMatterbridgeAccessoryPlatform(mockMatterbridge, mockLog, mockConfig)).toThrow(
-      'This plugin requires Matterbridge version >= "2.2.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
+      'This plugin requires Matterbridge version >= "2.2.7". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    mockMatterbridge.matterbridgeVersion = '2.2.0';
+    mockMatterbridge.matterbridgeVersion = '2.2.7';
   });
 
   it('should initialize platform with config name', () => {
@@ -200,7 +200,7 @@ describe('TestPlatform', () => {
 
     expect(accessoryPlatform.cover?.hasClusterServer(Identify.Cluster)).toBeTruthy();
     expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering.Cluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift))).toBeTruthy();
-    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster.id)).toBeTruthy();
 
     // Invoke command handlers
     await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 });
