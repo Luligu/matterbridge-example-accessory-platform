@@ -58,10 +58,10 @@ describe('initializePlugin', () => {
   } as unknown as Matterbridge;
 
   const mockConfig = {
-    'name': 'matterbridge-example-accessory-platform',
-    'type': 'AccessoryPlatform',
-    'unregisterOnShutdown': false,
-    'debug': false,
+    name: 'matterbridge-example-accessory-platform',
+    type: 'AccessoryPlatform',
+    unregisterOnShutdown: false,
+    debug: false,
   } as PlatformConfig;
 
   // Spy on and mock AnsiLogger.log

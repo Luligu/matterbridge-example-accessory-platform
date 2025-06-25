@@ -68,10 +68,10 @@ describe('TestPlatform', () => {
   } as unknown as Matterbridge;
 
   const mockConfig = {
-    'name': 'matterbridge-example-accessory-platform',
-    'type': 'AccessoryPlatform',
-    'unregisterOnShutdown': false,
-    'debug': true,
+    name: 'matterbridge-example-accessory-platform',
+    type: 'AccessoryPlatform',
+    unregisterOnShutdown: false,
+    debug: true,
   } as PlatformConfig;
 
   let loggerLogSpy: jest.SpiedFunction<typeof AnsiLogger.prototype.log>;
