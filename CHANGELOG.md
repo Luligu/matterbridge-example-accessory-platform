@@ -41,7 +41,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [logger]: Bumped `node-ansi-logger` to 3.1.1.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.9] - 2025-04-30
@@ -53,7 +53,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.8] - 2025-04-07
@@ -65,7 +65,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.7] - 2025-03-05
@@ -77,7 +77,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.6] - 2025-02-02
@@ -89,7 +89,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.4] - 2025-01-21
@@ -101,7 +101,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated package.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.3] - 2024-12-21
@@ -116,7 +116,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated package.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.2] - 2024-12-12
@@ -128,7 +128,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 ## [1.1.0] - 2024-11-25
@@ -140,7 +140,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Updated dependencies.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="./yellow-button.png" alt="Buy me a coffee" width="120">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
 </a>
 
 <!-- Commented out section
