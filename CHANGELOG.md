@@ -19,6 +19,17 @@ All notable changes to this project will be documented in this file.
 
 If you like this project and find it useful, please consider giving it a star on GitHub at https://github.com/Luligu/matterbridge-example-dynamic-platform and sponsoring it.
 
+## [1.2.1] - 2025-07-30
+
+### Changed
+
+- [package]: Updated package to Automator v. 2.0.3.
+- [package]: Updated dependencies.
+
+<a href="https://www.buymeacoffee.com/luligugithub">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
+</a>
+
 ## [1.2.0] - 2025-06-25
 
 ### Added
