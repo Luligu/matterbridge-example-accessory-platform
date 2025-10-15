@@ -203,13 +203,15 @@ describe('TestPlatform', () => {
   });
 
   it('should stop the server', async () => {
-    await (matterbridge as any).stopServerNode(server);
+    // @ts-expect-error - access to private member for testing
+    await matterbridge.stopServerNode(server);
     expect(server.lifecycle.isOnline).toBe(false);
     await server.env.get(MdnsService)[Symbol.asyncDispose]();
   });
 
   it('should stop the storage', async () => {
-    await (matterbridge as any).stopMatterStorage();
+    // @ts-expect-error - access to private member for testing
+    await matterbridge.stopMatterStorage();
     expect(matterbridge.matterStorageService).not.toBeDefined();
     expect(matterbridge.matterStorageManager).not.toBeDefined();
     expect(matterbridge.matterbridgeContext).not.toBeDefined();
