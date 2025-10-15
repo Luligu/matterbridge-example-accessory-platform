@@ -9,37 +9,10 @@ import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clust
 import { jest } from '@jest/globals';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
+import { createTestEnvironment, loggerLogSpy, setupTest } from './jestHelpers.ts';
 
-let loggerLogSpy: jest.SpiedFunction<typeof AnsiLogger.prototype.log>;
-let consoleLogSpy: jest.SpiedFunction<typeof console.log>;
-let consoleDebugSpy: jest.SpiedFunction<typeof console.log>;
-let consoleInfoSpy: jest.SpiedFunction<typeof console.log>;
-let consoleWarnSpy: jest.SpiedFunction<typeof console.log>;
-let consoleErrorSpy: jest.SpiedFunction<typeof console.log>;
-const debug = false; // Set to true to enable debug logs
-
-if (!debug) {
-  loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {});
-  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((...args: any[]) => {});
-  consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation((...args: any[]) => {});
-  consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation((...args: any[]) => {});
-  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: any[]) => {});
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args: any[]) => {});
-} else {
-  loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log');
-  consoleLogSpy = jest.spyOn(console, 'log');
-  consoleDebugSpy = jest.spyOn(console, 'debug');
-  consoleInfoSpy = jest.spyOn(console, 'info');
-  consoleWarnSpy = jest.spyOn(console, 'warn');
-  consoleErrorSpy = jest.spyOn(console, 'error');
-}
-
-// Cleanup the matter environment
-try {
-  rmSync(path.join('jest', 'platform'), { recursive: true, force: true });
-} catch (error) {
-  //
-}
+// Setup the test environment
+setupTest('Platform', false);
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
@@ -105,11 +78,8 @@ describe('TestPlatform', () => {
     matterbridge = await Matterbridge.loadInstance(false);
 
     // Setup matter environment
-    matterbridge.environment.vars.set('log.level', Level.DEBUG);
-    matterbridge.environment.vars.set('log.format', Format.ANSI);
-    matterbridge.environment.vars.set('path.root', path.join('jest', 'platform', '.matterbridge', 'matterstorage'));
-    matterbridge.environment.vars.set('runtime.signals', false);
-    matterbridge.environment.vars.set('runtime.exitcode', false);
+    // @ts-expect-error - access to private member for testing
+    matterbridge.environment = createTestEnvironment(path.join('jest', 'Platform'));
   });
 
   beforeEach(async () => {
@@ -194,7 +164,7 @@ describe('TestPlatform', () => {
 
     await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 });
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called request 100'));
-  }, 30000);
+  });
 
   it('should call onConfigure', async () => {
     jest.useFakeTimers();
@@ -225,23 +195,23 @@ describe('TestPlatform', () => {
       console.log(`Call ${index + 1}:`, call);
     });
     */
-  }, 60000);
+  }, 30000);
 
   it('should call onShutdown with reason', async () => {
     await accessoryPlatform.onShutdown('Test reason');
     expect(mockLog.info).toHaveBeenCalledWith('onShutdown called with reason:', 'Test reason');
-  }, 60000);
+  });
 
   it('should stop the server', async () => {
     await (matterbridge as any).stopServerNode(server);
     expect(server.lifecycle.isOnline).toBe(false);
     await server.env.get(MdnsService)[Symbol.asyncDispose]();
-  }, 60000);
+  });
 
   it('should stop the storage', async () => {
     await (matterbridge as any).stopMatterStorage();
     expect(matterbridge.matterStorageService).not.toBeDefined();
     expect(matterbridge.matterStorageManager).not.toBeDefined();
     expect(matterbridge.matterbridgeContext).not.toBeDefined();
-  }, 10000);
+  });
 });
