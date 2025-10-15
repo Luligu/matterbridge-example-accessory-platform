@@ -21,7 +21,7 @@
  * limitations under the License.
  */
 
-import { Matterbridge, MatterbridgeAccessoryPlatform, PlatformConfig, powerSource, MatterbridgeEndpoint, coverDevice } from 'matterbridge';
+import { MatterbridgeAccessoryPlatform, PlatformConfig, powerSource, MatterbridgeEndpoint, coverDevice, PlatformMatterbridge } from 'matterbridge';
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
 import { WindowCovering } from 'matterbridge/matter/clusters';
@@ -30,13 +30,13 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   cover?: MatterbridgeEndpoint;
   coverInterval?: NodeJS.Timeout;
 
-  constructor(matterbridge: Matterbridge, log: AnsiLogger, config: PlatformConfig) {
+  constructor(matterbridge: PlatformMatterbridge, log: AnsiLogger, config: PlatformConfig) {
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.0.0')) {
+    if (this.verifyMatterbridgeVersion === undefined || typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.3.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.0.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
+        `This plugin requires Matterbridge version >= "3.3.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
       );
     }
 
@@ -103,6 +103,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.coverInterval = setInterval(async () => {
       if (!this.cover) return;
       let position = this.cover.getAttribute(WindowCovering.Cluster.id, 'currentPositionLiftPercent100ths', this.log);
+      this.log.info(`Get liftPercent100thsValue ${position}`);
       if (!isValidNumber(position, 0, 10000)) return;
       position = position + 1000;
       position = position > 10000 ? 0 : position;

@@ -19,6 +19,28 @@ All notable changes to this project will be documented in this file.
 
 If you like this project and find it useful, please consider giving it a star on GitHub at https://github.com/Luligu/matterbridge-example-dynamic-platform and sponsoring it.
 
+## [1.3.0] - 2025-10-15
+
+### Changed
+
+- [package]: Require matterbridge 3.3.0.
+- [index]: Updated to new signature PlatformMatterbridge.
+- [platform]: Updated to new signature PlatformMatterbridge.
+- [platform]: Added whiteList and blackList.
+- [package]: Updated dependencies.
+- [package]: Bumped package to automator version 2.0.7
+- [workflows]: Ignore any .md in build.yaml.
+- [workflows]: Ignore any .md in codeql.yaml.
+- [workflows]: Ignore any .md in codecov.yaml.
+- [jest]: Updated jestHelpers to v. 1.0.6.
+- [workflows]: Improved speed on Node CI.
+- [devcontainer]: Added the plugin name to the container.
+- [devcontainer]: Improved performance of first build with shallow clone.
+
+<a href="https://www.buymeacoffee.com/luligugithub">
+  <img src="bmc-button.svg" alt="Buy me a coffee" width="80">
+</a>
+
 ## [1.2.2] - 2025-09-02
 
 ### Changed

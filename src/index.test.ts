@@ -7,37 +7,10 @@ import { jest } from '@jest/globals';
 
 import { ExampleMatterbridgeAccessoryPlatform } from './platform.ts';
 import initializePlugin from './index.ts';
+import { setupTest } from './jestHelpers.ts';
 
-let loggerLogSpy: jest.SpiedFunction<typeof AnsiLogger.prototype.log>;
-let consoleLogSpy: jest.SpiedFunction<typeof console.log>;
-let consoleDebugSpy: jest.SpiedFunction<typeof console.log>;
-let consoleInfoSpy: jest.SpiedFunction<typeof console.log>;
-let consoleWarnSpy: jest.SpiedFunction<typeof console.log>;
-let consoleErrorSpy: jest.SpiedFunction<typeof console.log>;
-const debug = false; // Set to true to enable debug logs
-
-if (!debug) {
-  loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log').mockImplementation((level: string, message: string, ...parameters: any[]) => {});
-  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((...args: any[]) => {});
-  consoleDebugSpy = jest.spyOn(console, 'debug').mockImplementation((...args: any[]) => {});
-  consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation((...args: any[]) => {});
-  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: any[]) => {});
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((...args: any[]) => {});
-} else {
-  loggerLogSpy = jest.spyOn(AnsiLogger.prototype, 'log');
-  consoleLogSpy = jest.spyOn(console, 'log');
-  consoleDebugSpy = jest.spyOn(console, 'debug');
-  consoleInfoSpy = jest.spyOn(console, 'info');
-  consoleWarnSpy = jest.spyOn(console, 'warn');
-  consoleErrorSpy = jest.spyOn(console, 'error');
-}
-
-// Cleanup the matter environment
-try {
-  rmSync(path.join('jest', 'index'), { recursive: true, force: true });
-} catch (error) {
-  //
-}
+// Setup the test environment
+setupTest('Index', false);
 
 describe('initializePlugin', () => {
   const mockLog = {
@@ -54,7 +27,7 @@ describe('initializePlugin', () => {
     matterbridgeDirectory: path.join('jest', 'index', '.matterbridge'),
     matterbridgePluginDirectory: path.join('jest', 'index', 'Matterbridge'),
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
-    matterbridgeVersion: '3.0.0',
+    matterbridgeVersion: '3.3.0',
     edge: true,
     log: mockLog,
     getDevices: jest.fn(() => {
@@ -68,12 +41,13 @@ describe('initializePlugin', () => {
     removeAllBridgedEndpoints: jest.fn(async (pluginName: string) => {}),
   } as unknown as Matterbridge;
 
-  const mockConfig = {
+  const mockConfig: PlatformConfig = {
     name: 'matterbridge-example-accessory-platform',
     type: 'AccessoryPlatform',
+    version: '1.0.0',
     unregisterOnShutdown: false,
     debug: false,
-  } as PlatformConfig;
+  };
 
   beforeEach(async () => {
     // Clear all mocks
