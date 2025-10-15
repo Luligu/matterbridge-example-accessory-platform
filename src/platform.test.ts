@@ -100,19 +100,22 @@ describe('TestPlatform', () => {
   });
 
   it('should create the context', async () => {
-    await (matterbridge as any).startMatterStorage();
+    // @ts-expect-error - access to private member for testing
+    await matterbridge.startMatterStorage();
     expect(matterbridge.matterStorageService).toBeDefined();
     expect(matterbridge.matterStorageManager).toBeDefined();
     expect(matterbridge.matterbridgeContext).toBeDefined();
   });
 
   it('should create the server', async () => {
-    server = await (matterbridge as any).createServerNode(matterbridge.matterbridgeContext);
+    // @ts-expect-error - access to private member for testing
+    server = await matterbridge.createServerNode(matterbridge.matterbridgeContext);
     expect(server).toBeDefined();
   });
 
   it('should create the aggregator', async () => {
-    aggregator = await (matterbridge as any).createAggregatorNode(matterbridge.matterbridgeContext);
+    // @ts-expect-error - access to private member for testing
+    aggregator = await matterbridge.createAggregatorNode(matterbridge.matterbridgeContext);
     expect(aggregator).toBeDefined();
   });
 
@@ -121,7 +124,8 @@ describe('TestPlatform', () => {
   });
 
   it('should start the server', async () => {
-    await (matterbridge as any).startServerNode(server);
+    // @ts-expect-error - access to private member for testing
+    await matterbridge.startServerNode(server);
     expect(server.lifecycle.isOnline).toBe(true);
   });
 
