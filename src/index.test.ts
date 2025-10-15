@@ -1,4 +1,7 @@
-import { rmSync } from 'node:fs';
+const MATTER_PORT = 6001;
+const NAME = 'Index';
+const HOMEDIR = path.join('jest', NAME);
+
 import path from 'node:path';
 
 import { Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
@@ -10,7 +13,7 @@ import initializePlugin from './index.ts';
 import { setupTest } from './jestHelpers.ts';
 
 // Setup the test environment
-setupTest('Index', false);
+setupTest(NAME, false);
 
 describe('initializePlugin', () => {
   const mockLog = {

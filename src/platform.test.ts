@@ -1,5 +1,8 @@
+const MATTER_PORT = 6002;
+const NAME = 'Platform';
+const HOMEDIR = path.join('jest', NAME);
+
 import path from 'node:path';
-import { rmSync } from 'node:fs';
 
 import { bridge, Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
@@ -12,7 +15,7 @@ import { ExampleMatterbridgeAccessoryPlatform } from './platform.js';
 import { createTestEnvironment, loggerLogSpy, setupTest } from './jestHelpers.ts';
 
 // Setup the test environment
-setupTest('Platform', false);
+setupTest(NAME, false);
 
 describe('TestPlatform', () => {
   let matterbridge: Matterbridge;
@@ -46,9 +49,9 @@ describe('TestPlatform', () => {
   } as unknown as AnsiLogger;
 
   const mockMatterbridge = {
-    homeDirectory: path.join('jest', 'platform'),
-    matterbridgeDirectory: path.join('jest', 'platform', '.matterbridge'),
-    matterbridgePluginDirectory: path.join('jest', 'platform', 'Matterbridge'),
+    homeDirectory: HOMEDIR,
+    matterbridgeDirectory: path.join(HOMEDIR, '.matterbridge'),
+    matterbridgePluginDirectory: path.join(HOMEDIR, 'Matterbridge'),
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
     matterbridgeVersion: '3.3.0',
     log: mockLog,
