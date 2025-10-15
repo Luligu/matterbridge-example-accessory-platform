@@ -31,6 +31,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [workflows]: Ignore any .md in build.yaml.
 - [workflows]: Ignore any .md in codeql.yaml.
 - [workflows]: Ignore any .md in codecov.yaml.
+- [template]: Updated bug_report.md.
 - [jest]: Updated jestHelpers to v. 1.0.6.
 - [workflows]: Improved speed on Node CI.
 - [devcontainer]: Added the plugin name to the container.
