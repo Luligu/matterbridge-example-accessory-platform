@@ -26,7 +26,6 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Require matterbridge 3.3.0.
 - [index]: Updated to new signature PlatformMatterbridge.
 - [platform]: Updated to new signature PlatformMatterbridge.
-- [platform]: Added whiteList and blackList.
 - [package]: Updated dependencies.
 - [package]: Bumped package to automator version 2.0.7
 - [workflows]: Ignore any .md in build.yaml.
