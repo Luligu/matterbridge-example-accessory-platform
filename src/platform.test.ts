@@ -195,7 +195,7 @@ describe('TestPlatform', () => {
       console.log(`Call ${index + 1}:`, call);
     });
     */
-  }, 30000);
+  });
 
   it('should call onShutdown with reason', async () => {
     await accessoryPlatform.onShutdown('Test reason');
