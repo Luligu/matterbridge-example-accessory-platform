@@ -1,9 +1,9 @@
 /**
  * This file contains the class ExampleMatterbridgeAccessoryPlatform.
  *
- * @file platform.ts
+ * @file module.ts
  * @author Luca Liguori
- * @version 1.2.0
+ * @version 2.0.0
  * @license Apache-2.0
  *
  * Copyright 2023, 2024, 2025, 2026 Luca Liguori.
@@ -25,6 +25,19 @@ import { MatterbridgeAccessoryPlatform, PlatformConfig, powerSource, Matterbridg
 import { isValidNumber } from 'matterbridge/utils';
 import { AnsiLogger } from 'matterbridge/logger';
 import { WindowCovering } from 'matterbridge/matter/clusters';
+
+/**
+ * This is the standard interface for Matterbridge plugins.
+ * Each plugin should export a default function that follows this signature.
+ *
+ * @param {PlatformMatterbridge} matterbridge - The Matterbridge instance.
+ * @param {AnsiLogger} log - The logger instance.
+ * @param {PlatformConfig} config - The platform configuration.
+ * @returns {ExampleMatterbridgeAccessoryPlatform} The initialized platform.
+ */
+export default function initializePlugin(matterbridge: PlatformMatterbridge, log: AnsiLogger, config: PlatformConfig): ExampleMatterbridgeAccessoryPlatform {
+  return new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
+}
 
 export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryPlatform {
   cover?: MatterbridgeEndpoint;
