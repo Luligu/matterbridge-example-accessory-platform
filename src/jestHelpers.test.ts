@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { Matterbridge, MatterbridgeEndpoint, onOffOutlet } from 'matterbridge';
-import { Endpoint, Environment, ServerNode } from 'matterbridge/matter';
+import { Endpoint, Environment, MdnsService, ServerNode } from 'matterbridge/matter';
 import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
 
 import {
@@ -64,27 +64,25 @@ describe('Matterbridge instance', () => {
   });
 
   test('should start a Matterbridge instance', async () => {
-    expect(matterbridge).toBeDefined();
-    expect(matterbridge).toBeInstanceOf(Matterbridge);
     [server, aggregator] = await startMatterbridgeEnvironment(matterbridge);
-    expect(matterbridge).toBeDefined();
-    expect(matterbridge).toBeInstanceOf(Matterbridge);
+    expect(server).toBeDefined();
+    expect(server).toBeInstanceOf(ServerNode);
+    expect(aggregator).toBeDefined();
+    expect(aggregator).toBeInstanceOf(Endpoint);
+    expect(server.lifecycle.isOnline).toBeTruthy();
   });
 
   test('should stop a Matterbridge instance', async () => {
-    expect(matterbridge).toBeDefined();
-    expect(matterbridge).toBeInstanceOf(Matterbridge);
     await stopMatterbridgeEnvironment(matterbridge, server, aggregator);
-    expect(matterbridge).toBeDefined();
-    expect(matterbridge).toBeInstanceOf(Matterbridge);
+    expect(server.lifecycle.isOnline).toBeFalsy();
   });
 
   test('should destroy a Matterbridge instance', async () => {
     expect(matterbridge).toBeDefined();
     expect(matterbridge).toBeInstanceOf(Matterbridge);
     await destroyMatterbridgeEnvironment(matterbridge);
-    expect(matterbridge).toBeDefined();
-    expect(matterbridge).toBeInstanceOf(Matterbridge);
+    // @ts-expect-error - accessing private member for testing
+    expect(Matterbridge.instance).toBeUndefined();
   });
 });
 
@@ -141,6 +139,7 @@ describe('Matter.js instance', () => {
 
   test('should stop a matter.js server node', async () => {
     await stopServerNode(server);
+    await server.env.get(MdnsService)[Symbol.asyncDispose]();
     expect(server).toBeDefined();
     expect(server).toBeInstanceOf(ServerNode);
   });
