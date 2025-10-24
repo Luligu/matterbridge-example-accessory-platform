@@ -55,12 +55,6 @@ describe('TestPlatform', () => {
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
     matterbridgeVersion: '3.3.0',
     log: mockLog,
-    getDevices: jest.fn(() => {
-      return [];
-    }),
-    getPlugins: jest.fn(() => {
-      return [];
-    }),
     addBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {
       await aggregator.add(device);
     }),

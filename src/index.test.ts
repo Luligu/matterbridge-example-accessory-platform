@@ -31,14 +31,7 @@ describe('initializePlugin', () => {
     matterbridgePluginDirectory: path.join('jest', 'index', 'Matterbridge'),
     systemInformation: { ipv4Address: undefined, ipv6Address: undefined, osRelease: 'xx.xx.xx.xx.xx.xx', nodeVersion: '22.1.10' },
     matterbridgeVersion: '3.3.0',
-    edge: true,
     log: mockLog,
-    getDevices: jest.fn(() => {
-      return [];
-    }),
-    getPlugins: jest.fn(() => {
-      return [];
-    }),
     addBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {}),
     removeBridgedEndpoint: jest.fn(async (pluginName: string, device: MatterbridgeEndpoint) => {}),
     removeAllBridgedEndpoints: jest.fn(async (pluginName: string) => {}),
