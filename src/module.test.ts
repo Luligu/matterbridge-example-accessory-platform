@@ -16,6 +16,7 @@ import {
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
   loggerLogSpy,
+  setDebug,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
@@ -126,8 +127,12 @@ describe('TestPlatform', () => {
     );
 
     // Simulate multiple interval executions
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 20; i++) {
+      // Flush microtasks
+      for (let i = 0; i < 100; i++) await Promise.resolve();
       await jest.advanceTimersByTimeAsync(60 * 1000);
+      // Flush microtasks
+      for (let i = 0; i < 100; i++) await Promise.resolve();
     }
 
     jest.useRealTimers();

@@ -109,6 +109,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     await super.onConfigure();
     this.log.info('onConfigure called');
 
+    await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
     await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
     this.log.info('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
