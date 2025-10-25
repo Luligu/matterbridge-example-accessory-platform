@@ -4,9 +4,9 @@ const HOMEDIR = path.join('jest', NAME);
 
 import path from 'node:path';
 
-import { Matterbridge, MatterbridgeEndpoint, PlatformConfig } from 'matterbridge';
+import { Matterbridge, PlatformConfig } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { ServerNode, Endpoint, LogLevel as Level, LogFormat as Format, MdnsService } from 'matterbridge/matter';
+import { ServerNode, Endpoint } from 'matterbridge/matter';
 import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 import { jest } from '@jest/globals';
@@ -14,10 +14,8 @@ import { jest } from '@jest/globals';
 import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from './module.js';
 import {
   createMatterbridgeEnvironment,
-  createTestEnvironment,
   destroyMatterbridgeEnvironment,
   loggerLogSpy,
-  setDebug,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
