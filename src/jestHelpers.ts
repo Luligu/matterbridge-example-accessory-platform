@@ -60,7 +60,7 @@ export let consoleErrorSpy: jest.SpiedFunction<typeof console.log>;
 
 export const addBridgedEndpointSpy = jest.spyOn(Matterbridge.prototype, 'addBridgedEndpoint');
 export const removeBridgedEndpointSpy = jest.spyOn(Matterbridge.prototype, 'removeBridgedEndpoint');
-export const removeAllBridgedEndpointSpy = jest.spyOn(Matterbridge.prototype, 'removeAllBridgedEndpoints');
+export const removeAllBridgedEndpointsSpy = jest.spyOn(Matterbridge.prototype, 'removeAllBridgedEndpoints');
 
 /**
  * Setup the Jest environment:
