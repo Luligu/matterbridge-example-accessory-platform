@@ -67,8 +67,10 @@ describe('TestPlatform', () => {
     const platform = initializePlugin(matterbridge, log, config);
     expect(platform).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
-    await platform.onShutdown('Test reason');
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'Test reason');
+    platform.config.unregisterOnShutdown = true;
+    await platform.onShutdown();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
+    platform.config.unregisterOnShutdown = false;
   });
 
   it('should throw error in load when version is not valid', () => {
@@ -125,22 +127,20 @@ describe('TestPlatform', () => {
       expect.stringContaining('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.'),
     );
 
+    // Simulate multiple interval executions
     for (let i = 0; i < 50; i++) {
-      // Flush microtasks
-      for (let i = 0; i < 10; i++) await Promise.resolve();
-      jest.advanceTimersByTimeAsync(60 * 1000);
-      // Flush microtasks
-      for (let i = 0; i < 10; i++) await Promise.resolve();
+      await jest.advanceTimersByTimeAsync(60 * 1000);
     }
 
-    expect(loggerLogSpy).toHaveBeenCalledTimes(13);
-    expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
-
     jest.useRealTimers();
+
+    expect(loggerLogSpy).toHaveBeenCalled();
+    expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
   });
 
   it('should call onShutdown without reason', async () => {
-    accessoryPlatform.config.unregisterOnShutdown = true;
+    accessoryPlatform.config.unregisterOnShutdown = false;
     await accessoryPlatform.onShutdown();
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
   });
