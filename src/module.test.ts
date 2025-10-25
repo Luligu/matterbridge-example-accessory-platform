@@ -135,6 +135,7 @@ describe('TestPlatform', () => {
 
     expect(loggerLogSpy).toHaveBeenCalled();
     expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
+    // We cannot check that liftPercent100thsValue was set multiple times because of transactions
     // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
   });
 
