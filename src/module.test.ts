@@ -4,10 +4,8 @@ const HOMEDIR = path.join('jest', NAME);
 
 import path from 'node:path';
 
-import { Matterbridge, PlatformConfig } from 'matterbridge';
+import { PlatformConfig } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
-import { ServerNode, Endpoint } from 'matterbridge/matter';
-import { AggregatorEndpoint } from 'matterbridge/matter/endpoints';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 import { jest } from '@jest/globals';
 
@@ -16,21 +14,18 @@ import {
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
   loggerLogSpy,
-  setDebug,
+  matterbridge,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
-} from './jestHelpers.ts';
+} from './utils/jestHelpers.js';
 
 // Setup the test environment
 setupTest(NAME, false);
 
 describe('TestPlatform', () => {
-  let matterbridge: Matterbridge;
-  let server: ServerNode<ServerNode.RootEndpoint>;
-  let aggregator: Endpoint<AggregatorEndpoint>;
   let accessoryPlatform: ExampleMatterbridgeAccessoryPlatform;
-  let log: AnsiLogger;
+  const log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
 
   const config: PlatformConfig = {
     name: 'matterbridge-example-accessory-platform',
@@ -41,9 +36,8 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
-    matterbridge = await createMatterbridgeEnvironment(NAME);
-    [server, aggregator] = await startMatterbridgeEnvironment(matterbridge, MATTER_PORT);
-    log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
+    await createMatterbridgeEnvironment(NAME);
+    await startMatterbridgeEnvironment(MATTER_PORT);
   });
 
   beforeEach(async () => {
@@ -56,8 +50,8 @@ describe('TestPlatform', () => {
   });
 
   afterAll(async () => {
-    await stopMatterbridgeEnvironment(matterbridge, server, aggregator);
-    await destroyMatterbridgeEnvironment(matterbridge);
+    await stopMatterbridgeEnvironment();
+    await destroyMatterbridgeEnvironment();
     // Restore all mocks
     jest.restoreAllMocks();
   });

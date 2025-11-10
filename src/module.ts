@@ -59,7 +59,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { uniqueStorageKey: 'Cover example device' }, this.config.debug as boolean);
+    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { id: 'Cover example device' }, this.config.debug as boolean);
     this.cover.log.logName = 'Cover example device';
     this.cover.createDefaultIdentifyClusterServer();
     this.cover.createDefaultBasicInformationClusterServer(
