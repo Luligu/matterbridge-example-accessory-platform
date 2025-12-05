@@ -8,9 +8,8 @@ import { PlatformConfig } from 'matterbridge';
 import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 import { jest } from '@jest/globals';
-
-import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from './module.js';
 import {
+  addMatterbridgePlatform,
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
   loggerLogSpy,
@@ -18,7 +17,9 @@ import {
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
-} from './utils/jestHelpers.js';
+} from 'matterbridge/jestutils';
+
+import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from './module.js';
 
 // Setup the test environment
 setupTest(NAME, false);
@@ -69,16 +70,14 @@ describe('TestPlatform', () => {
   it('should throw error in load when version is not valid', () => {
     matterbridge.matterbridgeVersion = '1.5.0';
     expect(() => new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config)).toThrow(
-      'This plugin requires Matterbridge version >= "3.3.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
+      'This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    matterbridge.matterbridgeVersion = '3.3.0';
+    matterbridge.matterbridgeVersion = '3.4.0';
   });
 
   it('should initialize platform with config name', () => {
-    // @ts-expect-error accessing private member for testing
-    matterbridge.plugins._plugins.set('matterbridge-jest', {});
     accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
-    accessoryPlatform['name'] = 'matterbridge-jest';
+    addMatterbridgePlatform(accessoryPlatform);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
   });
 
