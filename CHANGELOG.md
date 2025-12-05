@@ -23,6 +23,8 @@ If you like this project and find it useful, please consider giving it a star on
 
 ## [2.0.2] - 2025-12-05
 
+### Changed
+
 - [package]: Updated dependencies.
 - [package]: Updated to the current Matterbridge signatures.
 - [package]: Requires Matterbridge v.3.4.0.
