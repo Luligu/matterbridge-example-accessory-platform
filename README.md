@@ -24,7 +24,7 @@ If you want to write your plugin, the easiest way to start create a new plugin i
 If you like this project and find it useful, please consider giving it a star on GitHub at https://github.com/Luligu/matterbridge-example-accessory-platform and sponsoring it.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
-  <img src="bmc-button.svg" alt="Buy me a coffee" width="120">
+  <img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="120">
 </a>
 
 ## Prerequisites
