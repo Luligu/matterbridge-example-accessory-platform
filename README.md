@@ -21,7 +21,7 @@ It exposes a cover device that continuously moves position and shows how to use 
 
 If you want to write your plugin, the easiest way to start create a new plugin is to clone the [Matterbridge Plugin Template](https://github.com/Luligu/matterbridge-plugin-template) which has **Dev Container support for instant development environment** and all tools and extensions (like Node.js, npm, TypeScript, ESLint, Prettier, Jest and Vitest) already loaded and configured.
 
-If you like this project and find it useful, please consider giving it a star on GitHub at https://github.com/Luligu/matterbridge-example-accessory-platform and sponsoring it.
+If you like this project and find it useful, please consider giving it a star on [GitHub](https://github.com/Luligu/matterbridge-example-accessory-platform) and sponsoring it.
 
 <a href="https://www.buymeacoffee.com/luligugithub">
   <img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="120">
@@ -31,4 +31,4 @@ If you like this project and find it useful, please consider giving it a star on
 
 ### Matterbridge
 
-See the guidelines on [Matterbridge](https://github.com/Luligu/matterbridge/blob/main/README.md) for more information.
+See the guidelines on [Matterbridge](https://matterbridge.io) for more information.
