@@ -21,10 +21,10 @@
  * limitations under the License.
  */
 
-import { MatterbridgeAccessoryPlatform, PlatformConfig, powerSource, MatterbridgeEndpoint, coverDevice, PlatformMatterbridge } from 'matterbridge';
-import { isValidNumber } from 'matterbridge/utils';
+import { coverDevice, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { WindowCovering } from 'matterbridge/matter/clusters';
+import { isValidNumber } from 'matterbridge/utils';
 
 /**
  * This is the standard interface for Matterbridge plugins.
