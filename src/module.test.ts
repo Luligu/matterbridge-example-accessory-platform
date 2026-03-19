@@ -93,19 +93,19 @@ describe('TestPlatform', () => {
     expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster.id)).toBeTruthy();
 
     // Invoke command handlers
-    await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 });
+    await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 }, 'identify', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining(`Command identify called identifyTime: 1`));
 
-    await accessoryPlatform.cover?.executeCommandHandler('stopMotion', {} as any);
+    await accessoryPlatform.cover?.executeCommandHandler('stopMotion', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command stopMotion called'));
 
-    await accessoryPlatform.cover?.executeCommandHandler('upOrOpen', {} as any);
+    await accessoryPlatform.cover?.executeCommandHandler('upOrOpen', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command upOrOpen called'));
 
-    await accessoryPlatform.cover?.executeCommandHandler('downOrClose', {} as any);
+    await accessoryPlatform.cover?.executeCommandHandler('downOrClose', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command downOrClose called'));
 
-    await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 });
+    await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 }, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called request 100'));
   });
 
