@@ -84,24 +84,44 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       this.cover?.log.info(`Command identify called identifyTime: ${identifyTime}`);
     });
 
-    this.cover.addCommandHandler('stopMotion', async () => {
+    this.cover.addCommandHandler('stopMotion', async ({ attributes }) => {
       this.cover?.log.info(`Command stopMotion called`);
-      await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
+      attributes.targetPositionLiftPercent100ths = attributes.currentPositionLiftPercent100ths;
+      attributes.operationalStatus = {
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      };
     });
 
-    this.cover.addCommandHandler('upOrOpen', async () => {
+    this.cover.addCommandHandler('upOrOpen', async ({ attributes }) => {
       this.cover?.log.info(`Command upOrOpen called`);
-      await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
+      attributes.currentPositionLiftPercent100ths = 0;
+      attributes.operationalStatus = {
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      };
     });
 
-    this.cover.addCommandHandler('downOrClose', async () => {
+    this.cover.addCommandHandler('downOrClose', async ({ attributes }) => {
       this.cover?.log.info(`Command downOrClose called`);
-      await this.cover?.setWindowCoveringCurrentTargetStatus(10000, 10000, WindowCovering.MovementStatus.Stopped);
+      attributes.currentPositionLiftPercent100ths = 10000;
+      attributes.operationalStatus = {
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      };
     });
 
-    this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue } }) => {
+    this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue }, attributes }) => {
       this.cover?.log.info(`Command goToLiftPercentage called request ${liftPercent100thsValue}`);
-      await this.cover?.setWindowCoveringCurrentTargetStatus(liftPercent100thsValue, liftPercent100thsValue, WindowCovering.MovementStatus.Stopped);
+      attributes.currentPositionLiftPercent100ths = liftPercent100thsValue;
+      attributes.operationalStatus = {
+        global: WindowCovering.MovementStatus.Stopped,
+        lift: WindowCovering.MovementStatus.Stopped,
+        tilt: WindowCovering.MovementStatus.Stopped,
+      };
     });
   }
 
