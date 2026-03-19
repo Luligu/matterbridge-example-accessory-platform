@@ -41,7 +41,7 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Bump package to `automator` v.3.1.3.
 - [devcontainer]: Update `Dev Container` configuration.
 - [devcontainer]: Add postStartCommand to the `Dev Container` configuration.
-- [package]: Refactor `build.yml` to use matterbridge dev branch if the push is from the dev branch.
+- [package]: Refactor `build.yml` to use matterbridge dev branch for push and main for pull requests.
 - [package]: Add `type checking` script for Jest tests.
 
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
