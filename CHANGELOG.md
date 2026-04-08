@@ -26,6 +26,24 @@ If you like this project and find it useful, please consider giving it a star on
 
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="120"></a>
 
+## [2.0.12] - 2026-04-08
+
+### Changed
+
+- [package]: Bump package to `automator` v.3.1.5.
+- [package]: Bump `eslint` to v.10.2.0.
+- [package]: Bump `typescript` to v.6.0.2.
+- [package]: Bump `typescript-eslint` to v.8.58.1.
+- [devcontainer]: Fix pull of new image.
+- [devcontainer]: Update VS Code settings.
+- [devcontainer]: Leave matterbridge scripts in the cloned repo.
+- [scripts]: Update mb-run script.
+- [scripts]: Update package watch script.
+- [scripts]: Add prune-releases script.
+- [package]: Add `CODE_OF_CONDUCT.md`.
+
+<a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
+
 ## [2.0.11] - 2026-03-20
 
 ### Added
