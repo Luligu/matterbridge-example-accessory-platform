@@ -64,11 +64,12 @@ describe('TestPlatform', () => {
   });
 
   it('should throw error in load when version is not valid', () => {
+    const savedVersion = matterbridge.matterbridgeVersion;
     matterbridge.matterbridgeVersion = '1.5.0';
     expect(() => new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config)).toThrow(
       'This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    matterbridge.matterbridgeVersion = '3.4.0';
+    matterbridge.matterbridgeVersion = savedVersion;
   });
 
   it('should initialize platform with config name', () => {
