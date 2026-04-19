@@ -1,9 +1,6 @@
-const MATTER_PORT = 6000;
 const NAME = 'Platform';
-const HOMEDIR = path.join('jest', NAME);
+const MATTER_PORT = 6000;
 const CREATE_ONLY = true;
-
-import path from 'node:path';
 
 import { jest } from '@jest/globals';
 import { PlatformConfig } from 'matterbridge';
@@ -11,13 +8,14 @@ import {
   addMatterbridgePlatform,
   createMatterbridgeEnvironment,
   destroyMatterbridgeEnvironment,
+  log,
   loggerLogSpy,
   matterbridge,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
 } from 'matterbridge/jestutils';
-import { AnsiLogger, LogLevel, TimestampFormat } from 'matterbridge/logger';
+import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 
 import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from './module.js';
@@ -27,7 +25,6 @@ setupTest(NAME, false);
 
 describe('TestPlatform', () => {
   let accessoryPlatform: ExampleMatterbridgeAccessoryPlatform;
-  const log = new AnsiLogger({ logName: NAME, logTimestampFormat: TimestampFormat.TIME_MILLIS, logLevel: LogLevel.DEBUG });
 
   const config: PlatformConfig = {
     name: 'matterbridge-example-accessory-platform',
@@ -38,7 +35,7 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
-    await createMatterbridgeEnvironment(NAME, CREATE_ONLY);
+    await createMatterbridgeEnvironment();
     await startMatterbridgeEnvironment(MATTER_PORT, CREATE_ONLY);
   });
 
@@ -53,7 +50,7 @@ describe('TestPlatform', () => {
 
   afterAll(async () => {
     await stopMatterbridgeEnvironment(CREATE_ONLY);
-    await destroyMatterbridgeEnvironment(undefined, undefined, CREATE_ONLY);
+    await destroyMatterbridgeEnvironment(undefined, undefined, !CREATE_ONLY);
     // Restore all mocks
     jest.restoreAllMocks();
   });
