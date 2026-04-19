@@ -35,6 +35,7 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
+    // Create Matterbridge environment
     await createMatterbridgeEnvironment();
     await startMatterbridgeEnvironment(MATTER_PORT, CREATE_ONLY);
   });
@@ -44,11 +45,8 @@ describe('TestPlatform', () => {
     jest.clearAllMocks();
   });
 
-  afterEach(async () => {
-    //
-  });
-
   afterAll(async () => {
+    // Destroy Matterbridge environment
     await stopMatterbridgeEnvironment(CREATE_ONLY);
     await destroyMatterbridgeEnvironment(undefined, undefined, !CREATE_ONLY);
     // Restore all mocks
