@@ -11,6 +11,7 @@ import {
   log,
   loggerLogSpy,
   matterbridge,
+  setDebug,
   setupTest,
   startMatterbridgeEnvironment,
   stopMatterbridgeEnvironment,
@@ -45,10 +46,15 @@ describe('TestPlatform', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(async () => {
+    // Clear debug
+    await setDebug(false);
+  });
+
   afterAll(async () => {
     // Destroy Matterbridge environment
     await stopMatterbridgeEnvironment(CREATE_ONLY);
-    await destroyMatterbridgeEnvironment(undefined, undefined, !CREATE_ONLY);
+    await destroyMatterbridgeEnvironment();
     // Restore all mocks
     jest.restoreAllMocks();
   });
