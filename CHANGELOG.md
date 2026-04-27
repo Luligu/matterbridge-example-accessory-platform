@@ -43,6 +43,8 @@ If you like this project and find it useful, please consider giving it a star on
 - [agent]: Add `.claude\CLAUDE.md` for claude.
 - [agent]: Add agent custom instructions (`testing`) for copilot and claude.
 - [agent]: Add agent custom instructions (`matterbridge`) for copilot and claude.
+- [eslint]: Remove `eslint-plugin-promise` (not actively maintained) and add optional @typescript-eslint promise rules.
+- [package]: Remove `overrides` that was necessary for eslint-plugin-promise.
 
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
 
