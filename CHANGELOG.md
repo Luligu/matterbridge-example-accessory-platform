@@ -38,6 +38,8 @@ If you like this project and find it useful, please consider giving it a star on
 - [package]: Update `scripts`.
 - [eslint]: Add `eslint` v.2.0.3 config.
 
+<a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
+
 ## [2.0.14] - 2026-05-11
 
 ### Changed
