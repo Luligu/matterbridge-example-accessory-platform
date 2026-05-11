@@ -28,6 +28,16 @@ If you like this project and find it useful, please consider giving it a star on
 
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="120"></a>
 
+## [2.0.15] - Dev branch
+
+### Changed
+
+- [package]: Update dependencies.
+- [package]: Bump package to `automator` v.3.1.9.
+- [package]: Bump `typescript-eslint` to v.8.59.3.
+- [package]: Update `scripts`.
+- [eslint]: Add `eslint` v.2.0.3 config.
+
 ## [2.0.14] - 2026-05-11
 
 ### Changed
