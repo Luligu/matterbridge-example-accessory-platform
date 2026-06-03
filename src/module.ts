@@ -81,7 +81,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - addRequiredClusters is only in Matterbridge 3.8.0
     // istanbul ignore next line
-    if (this.verifyMatterbridgeVersion('3.8.0')) this.cover.addRequiredClusters();
+    if (this.verifyMatterbridgeVersion('3.8.0', false)) this.cover.addRequiredClusters();
     // istanbul ignore next line
     else this.cover.addRequiredClusterServers();
 
