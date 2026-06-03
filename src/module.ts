@@ -24,7 +24,7 @@
 import { coverDevice, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { WindowCovering } from 'matterbridge/matter/clusters';
-import { isValidNumber } from 'matterbridge/utils';
+import { fireAndForget, isValidNumber } from 'matterbridge/utils';
 
 /**
  * This is the standard interface for Matterbridge plugins.
@@ -78,13 +78,20 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover.createDefaultPowerSourceWiredClusterServer();
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - addRequiredClusters is only in Matterbridge 3.8.0
+    // istanbul ignore next line
+    if (this.verifyMatterbridgeVersion('3.8.0')) this.cover.addRequiredClusters();
+    // istanbul ignore next line
+    else this.cover.addRequiredClusterServers();
+
     await this.registerDevice(this.cover);
 
-    this.cover.addCommandHandler('identify', async ({ request: { identifyTime } }) => {
+    this.cover.addCommandHandler('identify', ({ request: { identifyTime } }) => {
       this.cover?.log.info(`Command identify called identifyTime: ${identifyTime}`);
     });
 
-    this.cover.addCommandHandler('stopMotion', async ({ attributes }) => {
+    this.cover.addCommandHandler('stopMotion', ({ attributes }) => {
       this.cover?.log.info(`Command stopMotion called`);
       attributes.targetPositionLiftPercent100ths = attributes.currentPositionLiftPercent100ths;
       attributes.operationalStatus = {
@@ -94,7 +101,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       };
     });
 
-    this.cover.addCommandHandler('upOrOpen', async ({ attributes }) => {
+    this.cover.addCommandHandler('upOrOpen', ({ attributes }) => {
       this.cover?.log.info(`Command upOrOpen called`);
       attributes.currentPositionLiftPercent100ths = 0;
       attributes.operationalStatus = {
@@ -104,7 +111,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       };
     });
 
-    this.cover.addCommandHandler('downOrClose', async ({ attributes }) => {
+    this.cover.addCommandHandler('downOrClose', ({ attributes }) => {
       this.cover?.log.info(`Command downOrClose called`);
       attributes.currentPositionLiftPercent100ths = 10000;
       attributes.operationalStatus = {
@@ -114,7 +121,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       };
     });
 
-    this.cover.addCommandHandler('goToLiftPercentage', async ({ request: { liftPercent100thsValue }, attributes }) => {
+    this.cover.addCommandHandler('goToLiftPercentage', ({ request: { liftPercent100thsValue }, attributes }) => {
       this.cover?.log.info(`Command goToLiftPercentage called request ${liftPercent100thsValue}`);
       attributes.currentPositionLiftPercent100ths = liftPercent100thsValue;
       attributes.operationalStatus = {
@@ -134,15 +141,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.log.info('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
     // Matter: 0 Fully open 10000 fully closed
-    this.coverInterval = setInterval(async () => {
-      if (!this.cover) return;
-      let position = this.cover.getAttribute(WindowCovering.Cluster.id, 'currentPositionLiftPercent100ths', this.log);
-      this.log.info(`Get liftPercent100thsValue ${position}`);
-      if (!isValidNumber(position, 0, 10000)) return;
-      position = position + 1000;
-      position = position > 10000 ? 0 : position;
-      await this.cover.setWindowCoveringCurrentTargetStatus(position, position, WindowCovering.MovementStatus.Stopped);
-      this.log.info(`Set liftPercent100thsValue to ${position}`);
+    // istanbul ignore next line because is too long for tests and we test the handler directly
+    this.coverInterval = setInterval(() => {
+      fireAndForget(this.intervalHandler(), this.log, 'Error in interval handler');
     }, 60 * 1000);
   }
 
@@ -152,5 +153,18 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     await super.onShutdown(reason);
     this.log.info('onShutdown called with reason:', reason ?? 'none');
     if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
+  }
+
+  async intervalHandler(): Promise<void> {
+    // istanbul ignore next line because is just a protection
+    if (!this.cover) return;
+    let position = this.cover.getAttribute(WindowCovering.Cluster.id, 'currentPositionLiftPercent100ths', this.log);
+    this.log.info(`Get liftPercent100thsValue ${position}`);
+    // istanbul ignore next line because is just a protection
+    if (!isValidNumber(position, 0, 10000)) return;
+    position = position + 1000;
+    position = position > 10000 ? 0 : position;
+    await this.cover.setWindowCoveringCurrentTargetStatus(position, position, WindowCovering.MovementStatus.Stopped);
+    this.log.info(`Set liftPercent100thsValue to ${position}`);
   }
 }
