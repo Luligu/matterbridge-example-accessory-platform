@@ -47,9 +47,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     super(matterbridge, log, config);
 
     // Verify that Matterbridge is the correct version
-    if (typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.4.0')) {
+    if (typeof this.verifyMatterbridgeVersion !== 'function' || !this.verifyMatterbridgeVersion('3.8.0')) {
       throw new Error(
-        `This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
+        `This plugin requires Matterbridge version >= "3.8.0". Please update Matterbridge from ${this.matterbridge.matterbridgeVersion} to the latest version in the frontend.`,
       );
     }
 
@@ -78,12 +78,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
     this.cover.createDefaultPowerSourceWiredClusterServer();
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - addRequiredClusters is only in Matterbridge 3.8.0
-    // istanbul ignore next line
-    if (this.verifyMatterbridgeVersion('3.8.0', false)) this.cover.addRequiredClusters();
-    // istanbul ignore next line
-    else this.cover.addRequiredClusterServers();
+    this.cover.addRequiredClusters();
 
     await this.registerDevice(this.cover);
 
@@ -158,7 +153,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   async intervalHandler(): Promise<void> {
     // istanbul ignore next line because is just a protection
     if (!this.cover) return;
-    let position = this.cover.getAttribute(WindowCovering.Cluster.id, 'currentPositionLiftPercent100ths', this.log);
+    let position = this.cover.getAttribute(WindowCovering, 'currentPositionLiftPercent100ths', this.log);
     this.log.info(`Get liftPercent100thsValue ${position}`);
     // istanbul ignore next line because is just a protection
     if (!isValidNumber(position, 0, 10000)) return;

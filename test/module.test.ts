@@ -70,12 +70,9 @@ describe('TestPlatform', () => {
   });
 
   it('should throw error in load when version is not valid', () => {
-    const savedVersion = matterbridge.matterbridgeVersion;
-    matterbridge.matterbridgeVersion = '1.5.0';
-    expect(() => new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config)).toThrow(
-      'This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
+    expect(() => new ExampleMatterbridgeAccessoryPlatform({ ...matterbridge, matterbridgeVersion: '1.5.0' }, log, config)).toThrow(
+      'This plugin requires Matterbridge version >= "3.8.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    matterbridge.matterbridgeVersion = savedVersion;
   });
 
   it('should initialize platform with config name', () => {
@@ -127,8 +124,7 @@ describe('TestPlatform', () => {
 
     expect(loggerLogSpy).toHaveBeenCalled();
     expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
-    // We cannot check that liftPercent100thsValue was set multiple times because of transactions
-    // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
   });
 
   it('should call onShutdown without reason', async () => {
