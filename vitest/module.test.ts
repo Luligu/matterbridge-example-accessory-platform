@@ -1,30 +1,29 @@
+/* eslint-disable vitest/no-standalone-expect */
+
 const NAME = 'Platform';
 const MATTER_PORT = 6000;
-const CREATE_ONLY = true;
 
-import { jest } from '@jest/globals';
-import { PlatformConfig } from 'matterbridge';
-import {
-  addMatterbridgePlatform,
-  createMatterbridgeEnvironment,
-  destroyMatterbridgeEnvironment,
-  log,
-  loggerLogSpy,
-  matterbridge,
-  setDebug,
-  setupTest,
-  startMatterbridgeEnvironment,
-  stopMatterbridgeEnvironment,
-} from 'matterbridge/jestutils';
+import { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
 import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
+import { log, loggerErrorSpy, loggerFatalSpy, loggerLogSpy, loggerWarnSpy, setDebug, setupTest } from 'matterbridge/vitest-utils';
+import {
+  addMatterbridge,
+  createServerNode,
+  createTestEnvironment,
+  destroyTestEnvironment,
+  getMatterbridge,
+  startServerNode,
+  stopServerNode,
+} from 'matterbridge/vitest-utils/matter';
 
-import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from './module.js';
+import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from '../src/module.js';
 
 // Setup the test environment
 setupTest(NAME, false);
 
 describe('TestPlatform', () => {
+  let matterbridge: PlatformMatterbridge;
   let accessoryPlatform: ExampleMatterbridgeAccessoryPlatform;
 
   const config: PlatformConfig = {
@@ -37,26 +36,32 @@ describe('TestPlatform', () => {
 
   beforeAll(async () => {
     // Create Matterbridge environment
-    await createMatterbridgeEnvironment();
-    await startMatterbridgeEnvironment(MATTER_PORT, CREATE_ONLY);
+    await createTestEnvironment();
+    await createServerNode(MATTER_PORT);
+    await startServerNode();
+    matterbridge = await getMatterbridge();
   });
 
-  beforeEach(async () => {
-    // Clear all mocks
-    jest.clearAllMocks();
+  beforeEach(() => {
+    // Reset the mock calls before each test
+    vi.clearAllMocks();
   });
 
   afterEach(async () => {
     // Clear debug
     await setDebug(false);
+    // No errors should be logged
+    expect(loggerWarnSpy).not.toHaveBeenCalled();
+    expect(loggerErrorSpy).not.toHaveBeenCalled();
+    expect(loggerFatalSpy).not.toHaveBeenCalled();
   });
 
   afterAll(async () => {
     // Destroy Matterbridge environment
-    await stopMatterbridgeEnvironment(CREATE_ONLY);
-    await destroyMatterbridgeEnvironment();
+    await stopServerNode();
+    await destroyTestEnvironment();
     // Restore all mocks
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should return an instance of TestPlatform', async () => {
@@ -70,17 +75,14 @@ describe('TestPlatform', () => {
   });
 
   it('should throw error in load when version is not valid', () => {
-    const savedVersion = matterbridge.matterbridgeVersion;
-    matterbridge.matterbridgeVersion = '1.5.0';
-    expect(() => new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config)).toThrow(
+    expect(() => new ExampleMatterbridgeAccessoryPlatform({ ...matterbridge, matterbridgeVersion: '1.5.0' }, log, config)).toThrow(
       'This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
     );
-    matterbridge.matterbridgeVersion = savedVersion;
   });
 
   it('should initialize platform with config name', () => {
     accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
-    addMatterbridgePlatform(accessoryPlatform);
+    addMatterbridge(accessoryPlatform);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
   });
 
@@ -127,8 +129,7 @@ describe('TestPlatform', () => {
 
     expect(loggerLogSpy).toHaveBeenCalled();
     expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
-    // We cannot check that liftPercent100thsValue was set multiple times because of transactions
-    // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
   });
 
   it('should call onShutdown without reason', async () => {

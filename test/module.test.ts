@@ -1,0 +1,139 @@
+const NAME = 'Platform';
+const MATTER_PORT = 6000;
+const CREATE_ONLY = true;
+
+import { jest } from '@jest/globals';
+import { PlatformConfig } from 'matterbridge';
+import {
+  addMatterbridgePlatform,
+  createMatterbridgeEnvironment,
+  destroyMatterbridgeEnvironment,
+  log,
+  loggerLogSpy,
+  matterbridge,
+  setDebug,
+  setupTest,
+  startMatterbridgeEnvironment,
+  stopMatterbridgeEnvironment,
+} from 'matterbridge/jestutils';
+import { LogLevel } from 'matterbridge/logger';
+import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
+
+import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from '../src/module.js';
+
+// Setup the test environment
+setupTest(NAME, false);
+
+describe('TestPlatform', () => {
+  let accessoryPlatform: ExampleMatterbridgeAccessoryPlatform;
+
+  const config: PlatformConfig = {
+    name: 'matterbridge-example-accessory-platform',
+    type: 'AccessoryPlatform',
+    version: '1.0.0',
+    unregisterOnShutdown: false,
+    debug: true,
+  };
+
+  beforeAll(async () => {
+    // Create Matterbridge environment
+    await createMatterbridgeEnvironment();
+    await startMatterbridgeEnvironment(MATTER_PORT, CREATE_ONLY);
+  });
+
+  beforeEach(async () => {
+    // Clear all mocks
+    jest.clearAllMocks();
+  });
+
+  afterEach(async () => {
+    // Clear debug
+    await setDebug(false);
+  });
+
+  afterAll(async () => {
+    // Destroy Matterbridge environment
+    await stopMatterbridgeEnvironment(CREATE_ONLY);
+    await destroyMatterbridgeEnvironment();
+    // Restore all mocks
+    jest.restoreAllMocks();
+  });
+
+  it('should return an instance of TestPlatform', async () => {
+    const platform = initializePlugin(matterbridge, log, config);
+    expect(platform).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
+    platform.config.unregisterOnShutdown = true;
+    await platform.onShutdown();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
+    platform.config.unregisterOnShutdown = false;
+  });
+
+  it('should throw error in load when version is not valid', () => {
+    const savedVersion = matterbridge.matterbridgeVersion;
+    matterbridge.matterbridgeVersion = '1.5.0';
+    expect(() => new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config)).toThrow(
+      'This plugin requires Matterbridge version >= "3.4.0". Please update Matterbridge from 1.5.0 to the latest version in the frontend.',
+    );
+    matterbridge.matterbridgeVersion = savedVersion;
+  });
+
+  it('should initialize platform with config name', () => {
+    accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
+    addMatterbridgePlatform(accessoryPlatform);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
+  });
+
+  it('should call onStart without reason', async () => {
+    accessoryPlatform.version = '1.6.6';
+    await accessoryPlatform.onStart();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onStart called with reason:', 'none');
+
+    expect(accessoryPlatform.cover).toBeDefined();
+
+    expect(accessoryPlatform.cover?.hasClusterServer(Identify.Cluster)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering.Cluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift))).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster.id)).toBeTruthy();
+
+    // Invoke command handlers
+    await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 }, 'identify', {} as any, accessoryPlatform.cover);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining(`Command identify called identifyTime: 1`));
+
+    await accessoryPlatform.cover?.executeCommandHandler('stopMotion', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command stopMotion called'));
+
+    await accessoryPlatform.cover?.executeCommandHandler('upOrOpen', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command upOrOpen called'));
+
+    await accessoryPlatform.cover?.executeCommandHandler('downOrClose', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command downOrClose called'));
+
+    await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 }, 'windowCovering', {} as any, accessoryPlatform.cover);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command goToLiftPercentage called request 100'));
+  });
+
+  it('should call onConfigure', async () => {
+    await accessoryPlatform.onConfigure();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('onConfigure called'));
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      LogLevel.INFO,
+      expect.stringContaining('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.'),
+    );
+
+    // Simulate multiple interval executions
+    for (let i = 0; i < 20; i++) {
+      await accessoryPlatform.intervalHandler();
+    }
+
+    expect(loggerLogSpy).toHaveBeenCalled();
+    expect(loggerLogSpy).not.toHaveBeenCalledWith(LogLevel.ERROR, expect.anything());
+    // We cannot check that liftPercent100thsValue was set multiple times because of transactions
+    // expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Set liftPercent100thsValue to'));
+  });
+
+  it('should call onShutdown without reason', async () => {
+    accessoryPlatform.config.unregisterOnShutdown = false;
+    await accessoryPlatform.onShutdown();
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
+  });
+});

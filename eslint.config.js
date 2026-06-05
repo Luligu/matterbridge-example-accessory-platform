@@ -9,8 +9,8 @@ import url from 'node:url';
 import js from '@eslint/js';
 import json from '@eslint/json';
 import markdown from '@eslint/markdown';
+import vitest from '@vitest/eslint-plugin';
 import { defineConfig } from 'eslint/config';
-import jest from 'eslint-plugin-jest';
 import jsdoc from 'eslint-plugin-jsdoc';
 import n from 'eslint-plugin-n';
 import prettier from 'eslint-plugin-prettier';
@@ -18,7 +18,7 @@ import importsort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
 const sourceFiles = ['**/*.{js,mjs,cjs,ts,mts,cts}'];
-const typescriptFiles = ['**/src/**/*.{ts,mts,cts}', '**/test/**/*.{spec,test}.{ts,mts,cts}', '**/vitest/**/*.{spec,test}.{ts,mts,cts}'];
+const typescriptFiles = ['**/src/**/*.{ts,mts,cts}', '**/test/**/*.{ts,mts,cts}', '**/vitest/**/*.{ts,mts,cts}'];
 const jestTestFiles = ['**/src/**/*.{spec,test}.{ts,mts,cts}', '**/test/**/*.{spec,test}.{ts,mts,cts}'];
 const vitestTestFiles = ['**/vitest/**/*.{spec,test}.{ts,mts,cts}'];
 const configDirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -26,7 +26,7 @@ const configDirname = path.dirname(url.fileURLToPath(import.meta.url));
 export default defineConfig([
   {
     name: 'Global Ignores',
-    ignores: [...vitestTestFiles, '**/.cache', '**/apps', '**/build', '**/chip', '**/coverage', '**/dist', '**/jest', '**/node_modules', '**/screenshots', '**/temp', '**/vendor'],
+    ignores: [...jestTestFiles, '**/.cache', '**/apps', '**/build', '**/chip', '**/coverage', '**/dist', '**/jest', '**/node_modules', '**/screenshots', '**/temp', '**/vendor'],
   },
   {
     name: 'JavaScript & TypeScript Source Files',
@@ -123,16 +123,16 @@ export default defineConfig([
     },
   },
   {
-    name: 'Jest Test Files',
-    files: jestTestFiles,
+    name: 'Vitest Test Files',
+    files: vitestTestFiles,
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
         tsconfigRootDir: configDirname,
-        project: 'tsconfig.jest.json', // Use a separate tsconfig for Jest tests
+        project: 'tsconfig.vitest.json', // Use a separate tsconfig for Vitest tests
       },
     },
-    extends: [jest.configs['flat/recommended']],
+    extends: [vitest.configs.recommended],
     rules: {
       'no-undef': 'off', // Disable no-undef for TypeScript files since TypeScript already checks for undefined variables
       'no-unused-vars': 'off', // Disable base rule for unused variables and use the TypeScript-specific rule instead
