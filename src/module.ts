@@ -59,26 +59,23 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   override async onStart(reason?: string) {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { id: 'Cover example device' }, this.config.debug);
-    this.cover.log.logName = 'Cover example device';
-    this.cover.createDefaultIdentifyClusterServer();
-    this.cover.createDefaultBasicInformationClusterServer(
-      'Cover example device',
-      `0x59108853594`,
-      0xfff1,
-      'Matterbridge',
-      0x0001,
-      'Matterbridge Cover',
-      parseInt(this.version.replace(/\D/g, '')),
-      this.version,
-      parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
-      this.matterbridge.matterbridgeVersion,
-    );
-    this.cover.createDefaultWindowCoveringClusterServer(10000);
-
-    this.cover.createDefaultPowerSourceWiredClusterServer();
-
-    this.cover.addRequiredClusters();
+    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { id: 'Cover example device' }, this.config.debug)
+      .createDefaultIdentifyClusterServer()
+      .createDefaultBasicInformationClusterServer(
+        'Cover example device',
+        `0x59108853594`,
+        0xfff1,
+        'Matterbridge',
+        0x0001,
+        'Matterbridge Cover',
+        parseInt(this.version.replace(/\D/g, '')),
+        this.version,
+        parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
+        this.matterbridge.matterbridgeVersion,
+      )
+      .createDefaultWindowCoveringClusterServer(10000)
+      .createDefaultPowerSourceWiredClusterServer()
+      .addRequiredClusters();
 
     await this.registerDevice(this.cover);
 
