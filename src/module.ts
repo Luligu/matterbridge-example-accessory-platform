@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-import { coverDevice, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge, powerSource } from 'matterbridge';
-import { AnsiLogger } from 'matterbridge/logger';
+import { windowCovering, MatterbridgeAccessoryPlatform, MatterbridgeEndpoint, type PlatformConfig, type PlatformMatterbridge, powerSource } from 'matterbridge';
+import type { AnsiLogger } from 'matterbridge/logger';
 import { WindowCovering } from 'matterbridge/matter/clusters';
 import { fireAndForget, isValidNumber } from 'matterbridge/utils';
 
@@ -56,10 +56,10 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.log.info('Initializing platform:', this.config.name);
   }
 
-  override async onStart(reason?: string) {
+  override async onStart(reason?: string): Promise<void> {
     this.log.info('onStart called with reason:', reason ?? 'none');
 
-    this.cover = new MatterbridgeEndpoint([coverDevice, powerSource], { id: 'Cover example device' }, this.config.debug)
+    this.cover = new MatterbridgeEndpoint([windowCovering, powerSource], { id: 'Cover example device' }, this.config.debug)
       .createDefaultIdentifyClusterServer()
       .createDefaultBasicInformationClusterServer(
         'Cover example device',
@@ -68,9 +68,9 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
         'Matterbridge',
         0x0001,
         'Matterbridge Cover',
-        parseInt(this.version.replace(/\D/g, '')),
+        Number.parseInt(this.version.replace(/\D/g, '')),
         this.version,
-        parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
+        Number.parseInt(this.matterbridge.matterbridgeVersion.replace(/\D/g, '')),
         this.matterbridge.matterbridgeVersion,
       )
       .createDefaultWindowCoveringClusterServer(10000)
@@ -124,7 +124,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     });
   }
 
-  override async onConfigure() {
+  override async onConfigure(): Promise<void> {
     await super.onConfigure();
     this.log.info('onConfigure called');
 
@@ -139,12 +139,12 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     }, 60 * 1000);
   }
 
-  override async onShutdown(reason?: string) {
+  override async onShutdown(reason?: string): Promise<void> {
     clearInterval(this.coverInterval);
     this.coverInterval = undefined;
     await super.onShutdown(reason);
     this.log.info('onShutdown called with reason:', reason ?? 'none');
-    if (this.config.unregisterOnShutdown === true) await this.unregisterAllDevices();
+    if (this.config.unregisterOnShutdown) await this.unregisterAllDevices();
   }
 
   async intervalHandler(): Promise<void> {

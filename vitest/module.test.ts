@@ -1,7 +1,7 @@
 const NAME = 'Platform';
 const MATTER_PORT = 6000;
 
-import { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
+import type { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
 import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 import { log, loggerErrorSpy, loggerFatalSpy, loggerLogSpy, loggerWarnSpy, setDebug, setupTest } from 'matterbridge/vitest-utils';
@@ -18,7 +18,7 @@ import {
 import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from '../src/module.js';
 
 // Setup the test environment
-setupTest(NAME, false);
+await setupTest(NAME, false);
 
 describe('TestPlatform', () => {
   let matterbridge: PlatformMatterbridge;
@@ -37,7 +37,7 @@ describe('TestPlatform', () => {
     await createTestEnvironment();
     await createServerNode(MATTER_PORT);
     await startServerNode();
-    matterbridge = await getMatterbridge();
+    matterbridge = getMatterbridge();
   });
 
   beforeEach(() => {
@@ -91,9 +91,9 @@ describe('TestPlatform', () => {
 
     expect(accessoryPlatform.cover).toBeDefined();
 
-    expect(accessoryPlatform.cover?.hasClusterServer(Identify.Cluster)).toBeTruthy();
-    expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering.Cluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift))).toBeTruthy();
-    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster.id)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(Identify)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource)).toBeTruthy();
 
     // Invoke command handlers
     await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 }, 'identify', {} as any, accessoryPlatform.cover);
@@ -121,7 +121,7 @@ describe('TestPlatform', () => {
     );
 
     // Simulate multiple interval executions
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 20; i += 1) {
       await accessoryPlatform.intervalHandler();
     }
 

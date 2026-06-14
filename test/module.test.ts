@@ -3,28 +3,19 @@ const MATTER_PORT = 6000;
 const CREATE_ONLY = true;
 
 import { jest } from '@jest/globals';
-import { PlatformConfig } from 'matterbridge';
-import {
-  addMatterbridgePlatform,
-  createMatterbridgeEnvironment,
-  destroyMatterbridgeEnvironment,
-  log,
-  loggerLogSpy,
-  matterbridge,
-  setDebug,
-  setupTest,
-  startMatterbridgeEnvironment,
-  stopMatterbridgeEnvironment,
-} from 'matterbridge/jestutils';
+import type { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
+import { log, loggerLogSpy, setDebug, setupTest } from 'matterbridge/jest-utils';
+import { createServerNode, createTestEnvironment, getMatterbridge, startServerNode, destroyTestEnvironment, stopServerNode, addMatterbridge } from 'matterbridge/jest-utils/matter';
 import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 
 import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from '../src/module.js';
 
 // Setup the test environment
-setupTest(NAME, false);
+await setupTest(NAME, false);
 
 describe('TestPlatform', () => {
+  let matterbridge: PlatformMatterbridge;
   let accessoryPlatform: ExampleMatterbridgeAccessoryPlatform;
 
   const config: PlatformConfig = {
@@ -37,11 +28,13 @@ describe('TestPlatform', () => {
 
   beforeAll(async () => {
     // Create Matterbridge environment
-    await createMatterbridgeEnvironment();
-    await startMatterbridgeEnvironment(MATTER_PORT, CREATE_ONLY);
+    await createTestEnvironment();
+    await createServerNode(MATTER_PORT);
+    await startServerNode();
+    matterbridge = getMatterbridge();
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
   });
@@ -53,8 +46,8 @@ describe('TestPlatform', () => {
 
   afterAll(async () => {
     // Destroy Matterbridge environment
-    await stopMatterbridgeEnvironment(CREATE_ONLY);
-    await destroyMatterbridgeEnvironment();
+    await stopServerNode();
+    await destroyTestEnvironment();
     // Restore all mocks
     jest.restoreAllMocks();
   });
@@ -77,7 +70,7 @@ describe('TestPlatform', () => {
 
   it('should initialize platform with config name', () => {
     accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
-    addMatterbridgePlatform(accessoryPlatform);
+    addMatterbridge(accessoryPlatform);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
   });
 
@@ -88,9 +81,9 @@ describe('TestPlatform', () => {
 
     expect(accessoryPlatform.cover).toBeDefined();
 
-    expect(accessoryPlatform.cover?.hasClusterServer(Identify.Cluster)).toBeTruthy();
-    expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering.Cluster.with(WindowCovering.Feature.Lift, WindowCovering.Feature.PositionAwareLift))).toBeTruthy();
-    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource.Cluster.id)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(Identify)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(WindowCovering)).toBeTruthy();
+    expect(accessoryPlatform.cover?.hasClusterServer(PowerSource)).toBeTruthy();
 
     // Invoke command handlers
     await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 }, 'identify', {} as any, accessoryPlatform.cover);
@@ -118,7 +111,7 @@ describe('TestPlatform', () => {
     );
 
     // Simulate multiple interval executions
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 20; i += 1) {
       await accessoryPlatform.intervalHandler();
     }
 
