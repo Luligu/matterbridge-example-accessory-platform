@@ -1,5 +1,6 @@
 const NAME = 'Platform';
 const MATTER_PORT = 6000;
+const MATTER_CREATE_ONLY = true;
 
 import type { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
 import { LogLevel } from 'matterbridge/logger';
@@ -10,6 +11,7 @@ import {
   createServerNode,
   createTestEnvironment,
   destroyTestEnvironment,
+  flushServerNode,
   getMatterbridge,
   startServerNode,
   stopServerNode,
@@ -35,8 +37,10 @@ describe('TestPlatform', () => {
   beforeAll(async () => {
     // Create Matterbridge environment
     await createTestEnvironment();
+    // Create the server node and aggregator
     await createServerNode(MATTER_PORT);
-    await startServerNode();
+    // Start the server node if not in create-only mode
+    if (!MATTER_CREATE_ONLY) await startServerNode();
     matterbridge = getMatterbridge();
   });
 
@@ -49,14 +53,15 @@ describe('TestPlatform', () => {
     // Clear debug
     await setDebug(false);
     // No errors should be logged
-    // expect(loggerWarnSpy).not.toHaveBeenCalled();
-    // expect(loggerErrorSpy).not.toHaveBeenCalled();
-    // expect(loggerFatalSpy).not.toHaveBeenCalled();
+    expect(loggerWarnSpy).not.toHaveBeenCalled();
+    expect(loggerErrorSpy).not.toHaveBeenCalled();
+    expect(loggerFatalSpy).not.toHaveBeenCalled();
   });
 
   afterAll(async () => {
-    // Destroy Matterbridge environment
-    await stopServerNode();
+    // Stop or flush the server node depending on the create-only mode
+    if (MATTER_CREATE_ONLY) await flushServerNode();
+    else await stopServerNode();
     await destroyTestEnvironment();
     // Restore all mocks
     vi.restoreAllMocks();

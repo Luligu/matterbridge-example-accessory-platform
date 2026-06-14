@@ -1,11 +1,20 @@
 const NAME = 'Platform';
 const MATTER_PORT = 6000;
-const CREATE_ONLY = true;
+const MATTER_CREATE_ONLY = true;
 
 import { jest } from '@jest/globals';
 import type { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
-import { log, loggerLogSpy, setDebug, setupTest } from 'matterbridge/jest-utils';
-import { createServerNode, createTestEnvironment, getMatterbridge, startServerNode, destroyTestEnvironment, stopServerNode, addMatterbridge } from 'matterbridge/jest-utils/matter';
+import { log, loggerErrorSpy, loggerFatalSpy, loggerLogSpy, loggerWarnSpy, setDebug, setupTest } from 'matterbridge/jest-utils';
+import {
+  createServerNode,
+  createTestEnvironment,
+  getMatterbridge,
+  startServerNode,
+  destroyTestEnvironment,
+  stopServerNode,
+  addMatterbridge,
+  flushServerNode,
+} from 'matterbridge/jest-utils/matter';
 import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
 
@@ -27,10 +36,12 @@ describe('TestPlatform', () => {
   };
 
   beforeAll(async () => {
-    // Create Matterbridge environment
+    // Create the Matter test environment
     await createTestEnvironment();
+    // Create the server node and aggregator
     await createServerNode(MATTER_PORT);
-    await startServerNode();
+    // Start the server node if not in create-only mode
+    if (!MATTER_CREATE_ONLY) await startServerNode();
     matterbridge = getMatterbridge();
   });
 
@@ -42,11 +53,17 @@ describe('TestPlatform', () => {
   afterEach(async () => {
     // Clear debug
     await setDebug(false);
+    // No errors should be logged
+    expect(loggerWarnSpy).not.toHaveBeenCalled();
+    expect(loggerErrorSpy).not.toHaveBeenCalled();
+    expect(loggerFatalSpy).not.toHaveBeenCalled();
   });
 
   afterAll(async () => {
-    // Destroy Matterbridge environment
-    await stopServerNode();
+    // Stop or flush the server node depending on the create-only mode
+    if (MATTER_CREATE_ONLY) await flushServerNode();
+    else await stopServerNode();
+    // Destroy the Matter test environment
     await destroyTestEnvironment();
     // Restore all mocks
     jest.restoreAllMocks();
