@@ -1,7 +1,6 @@
 /**
- * This file contains the class ExampleMatterbridgeAccessoryPlatform.
- *
- * @file module.ts
+ * @file src/module.ts
+ * @description This file contains the class ExampleMatterbridgeAccessoryPlatform.
  * @author Luca Liguori
  * @version 2.0.0
  * @license Apache-2.0
@@ -133,7 +132,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     this.log.info('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.');
 
     // Matter: 0 Fully open 10000 fully closed
-    // istanbul ignore next line because is too long for tests and we test the handler directly
+    /* v8 ignore next line because is too long for tests and we test the handler directly */
     this.coverInterval = setInterval(() => {
       fireAndForget(this.intervalHandler(), this.log, 'Error in interval handler');
     }, 60 * 1000);
@@ -148,11 +147,11 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
   }
 
   async intervalHandler(): Promise<void> {
-    // istanbul ignore next line because is just a protection
+    /* v8 ignore next line because is just a protection */
     if (!this.cover) return;
     let position = this.cover.getAttribute(WindowCovering, 'currentPositionLiftPercent100ths', this.log);
     this.log.info(`Get liftPercent100thsValue ${position}`);
-    // istanbul ignore next line because is just a protection
+    /* v8 ignore next line because is just a protection */
     if (!isValidNumber(position, 0, 10000)) return;
     position = position + 1000;
     position = position > 10000 ? 0 : position;

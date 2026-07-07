@@ -1,3 +1,9 @@
+/**
+ * @file vitest/module.test.ts
+ * @description This file contains the tests for the ExampleMatterbridgeAccessoryPlatform.
+ * @author Luca Liguori
+ */
+
 const NAME = 'Platform';
 const MATTER_PORT = 6000;
 const MATTER_CREATE_ONLY = true;
@@ -104,13 +110,13 @@ describe('TestPlatform', () => {
     await accessoryPlatform.cover?.executeCommandHandler('identify', { identifyTime: 1 }, 'identify', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining(`Command identify called identifyTime: 1`));
 
-    await accessoryPlatform.cover?.executeCommandHandler('stopMotion', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    await accessoryPlatform.cover?.executeCommandHandler('stopMotion', {}, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command stopMotion called'));
 
-    await accessoryPlatform.cover?.executeCommandHandler('upOrOpen', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    await accessoryPlatform.cover?.executeCommandHandler('upOrOpen', {}, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command upOrOpen called'));
 
-    await accessoryPlatform.cover?.executeCommandHandler('downOrClose', {} as any, 'windowCovering', {} as any, accessoryPlatform.cover);
+    await accessoryPlatform.cover?.executeCommandHandler('downOrClose', {}, 'windowCovering', {} as any, accessoryPlatform.cover);
     expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('Command downOrClose called'));
 
     await accessoryPlatform.cover?.executeCommandHandler('goToLiftPercentage', { liftPercent100thsValue: 100 }, 'windowCovering', {} as any, accessoryPlatform.cover);
