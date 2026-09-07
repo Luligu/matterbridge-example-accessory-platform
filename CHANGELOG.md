@@ -31,6 +31,10 @@ If you like this project and find it useful, please consider giving it a star on
 
 ## [3.0.4] - Dev branch
 
+### Added
+
+- [devcontainer]: Upgrade the `Dev Container` to v.2.1.0, using the Node.js and Bun stack.
+
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="80"></a>
 
 ## [3.0.3] - 2026-08-30
