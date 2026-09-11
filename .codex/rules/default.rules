@@ -1,4 +1,4 @@
-# Codex rules v.1.0.4
+# Codex rules v.1.0.5
 
 # Git mutations
 prefix_rule(pattern = ["git", "pull"], decision = "forbidden", justification = "This command must be run manually outside Codex.")
@@ -47,6 +47,11 @@ prefix_rule(pattern = ["npm", "run", "lint:fix"], decision = "forbidden", justif
 prefix_rule(pattern = ["npm", "run", "format"], decision = "allow")
 prefix_rule(pattern = ["npm", "run", "format:check"], decision = "allow")
 prefix_rule(pattern = ["bun", "test"], decision = "allow")
+
+# Repository automation: mb-run rewrites vendored files and package.json, so it always needs a confirmation.
+prefix_rule(pattern = ["mb-run"], decision = "prompt", justification = "Ask before running mb-run: it rewrites repository files.")
+prefix_rule(pattern = ["npx", "mb-run"], decision = "prompt", justification = "Ask before running mb-run: it rewrites repository files.")
+prefix_rule(pattern = ["bunx", "mb-run"], decision = "prompt", justification = "Ask before running mb-run: it rewrites repository files.")
 
 # External network and containers
 prefix_rule(pattern = ["curl"], decision = "prompt", justification = "Ask before external network fetches.")

@@ -1,4 +1,4 @@
-// VS Code settings v.1.0.11
+// VS Code settings v.1.0.12
 {
   "eslint.enable": false,
   "prettier.enable": false,
@@ -69,6 +69,10 @@
     "git reflog delete": false,
     // Denied: applies automatic fixes, so it needs an explicit confirmation.
     "npm run lint:fix": false,
+    // Ask: mb-run rewrites vendored files and package.json.
+    "mb-run": false,
+    "npx mb-run": false,
+    "bunx mb-run": false,
     // Ask: external network fetches and container runs.
     "curl": false,
     "Invoke-WebRequest": false,

@@ -1,5 +1,5 @@
 {
-  "_comment": "Antigravity settings v.1.0.0",
+  "_comment": "Antigravity settings v.1.0.1",
   "sandboxing": {
     // Confines agent operations strictly to the current workspace root directory
     "workspaceOnly": true,
@@ -49,6 +49,9 @@
       "command(bun uninstall)",
       "command(bun add)",
       "command(bun remove)",
+      "command(mb-run)",
+      "command(npx mb-run)",
+      "command(bunx mb-run)",
       "command(curl)",
       "command(Invoke-WebRequest)",
       "command(docker pull)",
