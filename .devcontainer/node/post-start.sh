@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# .devcontainer/node/post-start.sh v.2.1.0
+# .devcontainer/node/post-start.sh v.2.1.1
 
 # This script runs after the Dev Container is started to set up the dev container environment.
 

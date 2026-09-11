@@ -1,4 +1,4 @@
-# Dev Containers v.2.1.0
+# Dev Containers v.2.1.1
 
 Node and Bun configurations for Matterbridge plugins, aligned with Matterbridge’s Docker VMM setup. Open **Dev Containers: Reopen in Container** and select a runtime.
 
