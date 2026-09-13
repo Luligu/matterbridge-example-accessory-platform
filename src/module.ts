@@ -53,11 +53,11 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
       );
     }
 
-    this.log.info('Initializing platform:', this.config.name);
+    this.log.info(`Initializing platform ${this.config.name}...`);
   }
 
   override async onStart(reason?: string): Promise<void> {
-    this.log.info('onStart called with reason:', reason ?? 'none');
+    this.log.info(`Starting platform ${this.config.name} with reason: ${reason ?? 'no reason provided'}...`);
 
     this.cover = new MatterbridgeEndpoint([windowCovering, powerSource], { id: 'Cover example device' }, this.config.debug)
       .createDefaultIdentifyClusterServer()
@@ -126,7 +126,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
 
   override async onConfigure(): Promise<void> {
     await super.onConfigure();
-    this.log.info('onConfigure called');
+    this.log.info(`Configuring platform ${this.config.name}...`);
 
     await this.cover?.setWindowCoveringCurrentTargetStatus(0, 0, WindowCovering.MovementStatus.Stopped);
     await this.cover?.setWindowCoveringTargetAsCurrentAndStopped();
@@ -143,7 +143,7 @@ export class ExampleMatterbridgeAccessoryPlatform extends MatterbridgeAccessoryP
     clearInterval(this.coverInterval);
     this.coverInterval = undefined;
     await super.onShutdown(reason);
-    this.log.info('onShutdown called with reason:', reason ?? 'none');
+    this.log.info(`Shutting down platform ${this.config.name} with reason: ${reason ?? 'no reason provided'}...`);
     if (this.config.unregisterOnShutdown) await this.unregisterAllDevices();
   }
 

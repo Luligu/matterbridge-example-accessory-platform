@@ -76,10 +76,10 @@ describe('TestPlatform', () => {
   it('should return an instance of TestPlatform', async () => {
     const platform = initializePlugin(matterbridge, log, config);
     expect(platform).toBeInstanceOf(ExampleMatterbridgeAccessoryPlatform);
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Initializing platform ${config.name}...`);
     platform.config.unregisterOnShutdown = true;
     await platform.onShutdown();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: no reason provided...`);
     platform.config.unregisterOnShutdown = false;
   });
 
@@ -92,13 +92,13 @@ describe('TestPlatform', () => {
   it('should initialize platform with config name', () => {
     accessoryPlatform = new ExampleMatterbridgeAccessoryPlatform(matterbridge, log, config);
     addMatterbridge(accessoryPlatform);
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'Initializing platform:', config.name);
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Initializing platform ${config.name}...`);
   });
 
   it('should call onStart without reason', async () => {
     accessoryPlatform.version = '1.6.6';
     await accessoryPlatform.onStart();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onStart called with reason:', 'none');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Starting platform ${config.name} with reason: no reason provided...`);
 
     expect(accessoryPlatform.cover).toBeDefined();
 
@@ -125,7 +125,7 @@ describe('TestPlatform', () => {
 
   it('should call onConfigure', async () => {
     await accessoryPlatform.onConfigure();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining('onConfigure called'));
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, expect.stringContaining(`Configuring platform ${config.name}...`));
     expect(loggerLogSpy).toHaveBeenCalledWith(
       LogLevel.INFO,
       expect.stringContaining('Set cover initial targetPositionLiftPercent100ths = currentPositionLiftPercent100ths and operationalStatus to Stopped.'),
@@ -144,6 +144,6 @@ describe('TestPlatform', () => {
   it('should call onShutdown without reason', async () => {
     accessoryPlatform.config.unregisterOnShutdown = false;
     await accessoryPlatform.onShutdown();
-    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, 'onShutdown called with reason:', 'none');
+    expect(loggerLogSpy).toHaveBeenCalledWith(LogLevel.INFO, `Shutting down platform ${config.name} with reason: no reason provided...`);
   });
 });
