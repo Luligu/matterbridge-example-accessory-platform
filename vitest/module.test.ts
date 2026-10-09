@@ -11,7 +11,6 @@ const MATTER_CREATE_ONLY = true;
 import type { PlatformConfig, PlatformMatterbridge } from 'matterbridge';
 import { LogLevel } from 'matterbridge/logger';
 import { Identify, PowerSource, WindowCovering } from 'matterbridge/matter/clusters';
-import { log, loggerErrorSpy, loggerFatalSpy, loggerLogSpy, loggerWarnSpy, setDebug, setupTest } from 'matterbridge/vitest-utils';
 import {
   addMatterbridge,
   createServerNode,
@@ -19,9 +18,16 @@ import {
   destroyTestEnvironment,
   flushServerNode,
   getMatterbridge,
+  log,
+  loggerErrorSpy,
+  loggerFatalSpy,
+  loggerLogSpy,
+  loggerWarnSpy,
+  setDebug,
+  setupTest,
   startServerNode,
   stopServerNode,
-} from 'matterbridge/vitest-utils/matter';
+} from 'matterbridge/test-utils/vitest';
 
 import initializePlugin, { ExampleMatterbridgeAccessoryPlatform } from '../src/module.js';
 
