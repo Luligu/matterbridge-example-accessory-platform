@@ -43,6 +43,7 @@ If you like this project and find it useful, please consider giving it a star on
 
 ### Changed
 
+- [package]: Update the `package.json` description to "Matterbridge example accessory plugin".
 - [test]: Migrate tests from `matterbridge/vitest-utils` to the unified `matterbridge/test-utils`.
 - [oxc]: Exclude `scripts` directories from lint and format checks.
 - [styleguide]: Update [`STYLEGUIDE.md`](STYLEGUIDE.md) to v.1.1.0: align it with the lint and format config and add the Commit Messages and Changelog sections.
