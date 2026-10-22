@@ -29,7 +29,7 @@ If you like this project and find it useful, please consider giving it a star on
 
 <a href="https://www.buymeacoffee.com/luligugithub"><img src="https://matterbridge.io/assets/bmc-button.svg" alt="Buy me a coffee" width="120"></a>
 
-## [3.0.4] - Dev branch
+## [3.1.0] - 2026-10-23
 
 ### Breaking changes
 
@@ -44,7 +44,6 @@ If you like this project and find it useful, please consider giving it a star on
 
 ### Changed
 
-- [workflows]: Build and test against the matterbridge `dev` branch (`automator.workflow`).
 - [package]: Run `checkDependencies` and `updateDependencies` with `npx npm-check-updates@latest`.
 - [package]: Update the `package.json` description to "Matterbridge example accessory plugin".
 - [test]: Migrate tests from `matterbridge/vitest-utils` to the unified `matterbridge/test-utils`.
